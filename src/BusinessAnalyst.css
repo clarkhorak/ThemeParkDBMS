@@ -15,6 +15,11 @@
 
 #signout *{
   color: white;
+  font-family: 'Mitr', serif;
+  font-size: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: -5px;
 }
 
 .nav-item {
