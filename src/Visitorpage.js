@@ -152,13 +152,13 @@ function Visitorpage() {
   const AccDeleteOut = () =>{
     localStorage.removeItem("authenticatedV");
     localStorage.removeItem("idV");
-    navigate("/"); //Navigate back to main page
+    navigate("/");
   }
 
   const signOut = () => {
     localStorage.removeItem("authenticatedV");
     localStorage.removeItem("idV");
-    navigate("/"); //Navigate back to main page
+    navigate("/");
   };
 
   function GetVisitorObj() {

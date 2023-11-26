@@ -2,8 +2,6 @@ import './Signin.css';
 import { Link, useNavigate } from "react-router-dom"; 
 import { useState, useEffect } from 'react';
 
-//https://www.makeuseof.com/redirect-user-after-login-react/
-
 function Signin() {
     //customer data
     const[CustomerData, setCustomerData] = useState([]);
@@ -48,7 +46,6 @@ function Signin() {
         let user = null;
         for (const obj of EmployeeData) {
           if (obj.email === email ) {
-            console.log(email);
             if(obj.user_pass === password) {
               console.log("Login successful");
               setauthenticated(true);
@@ -68,7 +65,6 @@ function Signin() {
         let user = null;
         for (const obj of EmployeeData) {
           if (obj.email === email ) {
-            console.log(email);
             if(obj.user_pass === password) {
               console.log("Login successful");
               setauthenticated(true);
@@ -85,11 +81,9 @@ function Signin() {
       }
       
       else {
-        console.log("You are not an employee");
         let user = null;
         for (const obj of CustomerData) {
           if (obj.email === email ) {
-            console.log(email);
             if(obj.user_pass === password) {
               console.log("Login successful");
               setauthenticated(true);
@@ -105,7 +99,7 @@ function Signin() {
         }
       }
     };
-    //console.log(CustomerData);
+    
     return (
     <div className="Signin">
       <link rel="preconnect" href="https://fonts.googleapis.com"></link>

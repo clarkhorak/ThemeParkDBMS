@@ -1,11 +1,16 @@
 # A Theme Park Web App
 
-## Install react-router-dom, concurrently, react-datepicker with 'npm i react-router-dom concurrently react-datepicker' for this web app to work on your local instance
+## Install following dependencies for this app to work on your local instance:
+## npm install
+## Microsoft SQL Server client, npm install mssql
+## react-router-dom, npm i react-router-dom
+## concurrently, npm install concurrently 
+## datepicker, npm i react-datepicker
 
 ## Available Scripts
 
 In the project directory, you can run:
-### `npm install`
+
 ### `npm start`
 
 Runs the app in the development mode.\
@@ -14,7 +19,7 @@ Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 The page will reload when you make changes.\
 You may also see any lint errors in the console.
 
-### `npm run build:react`
+### `npm run build`
 
 Builds the app for production to the `build` folder.\
 It correctly bundles React in production mode and optimizes the build for the best performance.
