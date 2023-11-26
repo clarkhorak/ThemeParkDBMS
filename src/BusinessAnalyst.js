@@ -279,13 +279,13 @@ const navigate = useNavigate();
 
 const signOut = () => {
   localStorage.removeItem("authenticatedB");
-  localStorage.removeItem("nameB");
-  navigate("/"); //Navigate back to main page
+  localStorage.removeItem("idB");
+  navigate("/");
 };
 
 function GetEmpObj() {
   for (const obj of StaffData) {
-    if (obj.first_name === localStorage.getItem("nameB")) {
+    if (obj.employee_id === localStorage.getItem("idB")) {
       return (
           <div key={obj.employee_id}>
             <h3>
@@ -323,6 +323,15 @@ function GetEmpObj() {
   }
 }
 
+function ReturnEmployeeName() {
+  for (const obj of StaffData) {
+    if(obj.employee_id == localStorage.getItem("idB")) {
+      return (
+        <div>Welcome back, {obj.first_name}!</div>
+      );
+    }
+  }
+}
 
 if (localStorage.getItem("authenticatedB") === false || localStorage.getItem("authenticatedB") == null) {
   console.log("Unsuccessful login");
@@ -343,7 +352,7 @@ else{
       </ul>
       {StaffData.map((employee) => (
         <div className="welcome-back-employee" key={employee.id}>
-          Welcome back, {localStorage.getItem("nameB")}!
+          <ReturnEmployeeName />
         </div>
         ))}
         <div className="visitortype">
