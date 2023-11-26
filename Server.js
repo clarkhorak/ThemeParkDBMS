@@ -164,6 +164,7 @@ const server = http.createServer(async (req, res) => {
     }
   });
 
+
   //visitorpage delete account section
 } else if (req.url=== '/api/AccountDelete' && req.method === 'POST') {
   let body = '';
@@ -627,6 +628,170 @@ const server = http.createServer(async (req, res) => {
         }
       });
     }
+
+
+
+
+    else if (req.url=== '/api/addstallinfob' && req.method === 'POST') {
+      let body = '';
+      req.on('data', (chunk) => {
+        body += chunk;
+      });
+      req.on('end', async () => {
+        try {
+          await sql.connect(config);
+          const { Zone_code, Name, Type, Status, Revenue, Expense, Profit } = JSON.parse(body);
+          const setZone = (Zone_code) => {
+            let Zone = '';
+            switch(Zone_code){
+              case '':
+              break;
+              case 'ZONE0001':
+                Zone = 'ZONE0001';
+              break;
+              case 'ZONE0002':
+                Zone = 'ZONE0002';
+              break;
+              case 'ZONE0003':
+                Zone = 'ZONE0003';
+              break;
+              case 'ZONE0004':
+                Zone = 'ZONE0004';
+              break;
+            }
+            return Zone;
+          }
+          const Zone = setZone(Zone_code);
+         const setStallID = (Zone) => {
+          let ID ='';
+          switch(Zone){
+            case '':
+              break;
+            case 'ZONE0001':
+              ID = 'FDS1';
+            break;
+            case 'ZONE0002':
+              ID = 'FDS2';
+            break;
+            case 'ZONE0003':
+              ID = 'FDS3';
+            break;
+            case 'ZONE0004':
+              ID = 'FDS4';
+            break;
+          }
+          return ID;
+         }
+         const ID = setStallID(Zone);
+         const setStallType = (Type) => {
+          let T ='';
+          switch(Type){
+            case '':
+              break;
+            case 'Casual Dining':
+              T = 'Casual Dining';
+            break;
+            case 'Quick Service Dining':
+              T = 'Quick Service Dining';
+            break;
+          }
+          return T;
+         }
+         const T = setStallType(Type);
+         const setStat = (Status) => {
+          let Stat = '';
+          switch(Status){
+            case '':
+            break;
+            case 'Active':
+              Stat = 'Active'
+            break;
+            case 'Inactive':
+              Stat = 'Inactive';
+            break;
+          }
+          return Stat;
+        }
+        const Stat = setStat(Status);
+          await sql.query(`
+            INSERT INTO food_stalls (Stall_ID, Zone_code, Name, Type, Status, Revenue, Expense, Profit)
+            VALUES (CONCAT('${ID}', SUBSTRING(CONVERT(VARCHAR(255), NEWID()), 1, 4)), '${Zone}', '${Name}', '${T}', '${Stat}', ${Revenue}, ${Expense}, ${Profit});
+          `);
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({ success: true, message: 'Added Information successfully' }));
+        } catch (error) {
+          console.error('Error processing:', error.message);
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({ success: false, message: 'Internal Server Error' }));
+        } finally {
+          // await sql.close();
+        }
+      });
+    }
+    else if (req.url=== '/api/addshopinfob' && req.method === 'POST') {
+      let body = '';
+      req.on('data', (chunk) => {
+        body += chunk;
+      });
+      req.on('end', async () => {
+        try {
+          await sql.connect(config);
+          const { Zone_code, Name, ProductType, ProductAmount, Status, Revenue, Expenses, Profit } = JSON.parse(body);
+          const setZone = (Zone_code) => {
+            let Zone = '';
+            switch(Zone_code){
+              case '':
+              break;
+              case 'ZONE0001':
+                Zone = 'ZONE0001';
+              break;
+              case 'ZONE0002':
+                Zone = 'ZONE0002';
+              break;
+              case 'ZONE0003':
+                Zone = 'ZONE0003';
+              break;
+              case 'ZONE0004':
+                Zone = 'ZONE0004';
+              break;
+            }
+            return Zone;
+          }
+          const Zone = setZone(Zone_code);
+          const setStat = (Status) => {
+            let Stat = '';
+            switch(Status){
+              case '':
+              break;
+              case 'Active':
+                Stat = 'Active'
+              break;
+              case 'Inactive':
+                Stat = 'Inactive';
+              break;
+            }
+            return Stat;
+          }
+          const Stat = setStat(Status);
+          await sql.query(`
+            INSERT INTO Merchandise ( Shop_id, Zone_code, Name, ProductType, ProductAmount, Status, Revenue, Expenses, Profit)
+            VALUES (CONCAT('SHOP', SUBSTRING(CONVERT(VARCHAR(255), NEWID()), 1, 4)), '${Zone}', '${Name}', '${ProductType}', ${ProductAmount}, '${Stat}',${Revenue}, ${Expenses}, ${Profit});
+          `);
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({ success: true, message: 'Added Information successfully' }));
+        } catch (error) {
+          console.error('Error processing:', error.message);
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({ success: false, message: 'Internal Server Error' }));
+        } finally {
+          // await sql.close();
+        }
+      });
+    }
+
+
+
+
     else if (req.url=== '/api/addstallinfo' && req.method === 'POST') {
       let body = '';
       req.on('data', (chunk) => {
@@ -1050,6 +1215,166 @@ const server = http.createServer(async (req, res) => {
         }
       });
     }
+
+
+
+
+    else if (req.url=== '/api/updatestallinfob' && req.method === 'POST') {
+      let body = '';
+      req.on('data', (chunk) => {
+        body += chunk;
+      });
+      req.on('end', async () => {
+        try {
+          await sql.connect(config);
+          const { Zone_code, Stall_ID, Name, Type, Status, Revenue, Expense, Profit } = JSON.parse(body);
+          const setZone = (Zone_code) => {
+            let Zone = '';
+            switch(Zone_code){
+              case '':
+              break;
+              case 'ZONE0001':
+                Zone = 'ZONE0001';
+              break;
+              case 'ZONE0002':
+                Zone = 'ZONE0002';
+              break;
+              case 'ZONE0003':
+                Zone = 'ZONE0003';
+              break;
+              case 'ZONE0004':
+                Zone = 'ZONE0004';
+              break;
+            }
+            return Zone;
+          }
+          const Zone = setZone(Zone_code);
+         const setStallType = (Type) => {
+          let T ='';
+          switch(Type){
+            case '':
+              break;
+            case 'Casual Dining':
+              T = 'Casual Dining';
+            break;
+            case 'Quick Service Dining':
+              T = 'Quick Service Dining';
+            break;
+          }
+          return T;
+         }
+         const T = setStallType(Type);
+         const setStat = (Status) => {
+          let Stat = '';
+          switch(Status){
+            case '':
+            break;
+            case 'Active':
+              Stat = 'Active'
+            break;
+            case 'Inactive':
+              Stat = 'Inactive';
+            break;
+          }
+          return Stat;
+        }
+        const Stat = setStat(Status);
+          await sql.query(`
+          UPDATE food_stalls
+          SET
+          Name = '${Name}',
+          Type = '${T}',
+          Status = '${Stat}'
+          Revenue = ${Revenue},
+          Expense = ${Expense},
+          Profit = ${Profit}
+          WHERE Stall_ID = '${Stall_ID}' AND Zone_code = '${Zone}';
+          `);
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({ success: true, message: 'Updated Information successfully' }));
+        } catch (error) {
+          console.error('Error processing:', error.message);
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({ success: false, message: 'Internal Server Error' }));
+        } finally {
+          // await sql.close();
+        }
+      });
+    }
+    else if (req.url=== '/api/updateshopinfob' && req.method === 'POST') {
+      let body = '';
+      req.on('data', (chunk) => {
+        body += chunk;
+      });
+      req.on('end', async () => {
+        try {
+          await sql.connect(config);
+          const { Zone_code, Shop_id, Name, ProductType, ProductAmount, Status, Revenue, Expenses, Profit } = JSON.parse(body);
+          const setZone = (Zone_code) => {
+            let Zone = '';
+            switch(Zone_code){
+              case '':
+              break;
+              case 'ZONE0001':
+                Zone = 'ZONE0001';
+              break;
+              case 'ZONE0002':
+                Zone = 'ZONE0002';
+              break;
+              case 'ZONE0003':
+                Zone = 'ZONE0003';
+              break;
+              case 'ZONE0004':
+                Zone = 'ZONE0004';
+              break;
+            }
+            return Zone;
+          }
+          const Zone = setZone(Zone_code);
+          const setStat = (Status) => {
+            let Stat = '';
+            switch(Status){
+              case '':
+              break;
+              case 'Active':
+                Stat = 'Active'
+              break;
+              case 'Inactive':
+                Stat = 'Inactive';
+              break;
+            }
+            return Stat;
+          }
+          const Stat = setStat(Status);
+          await sql.query(`
+          UPDATE Merchandise
+          SET
+          Name = '${Name}',
+          ProductType = '${ProductType}',
+          ProductAmount = '${ProductAmount}',
+          Status = '${Stat}',
+          Revenue = ${Revenue},
+          Expense = ${Expenses},
+          Profit = ${Profit}
+          WHERE Shop_id = '${Shop_id}' AND Zone_code = '${Zone}';
+          `);
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({ success: true, message: 'Updated Information successfully' }));
+        } catch (error) {
+          console.error('Error processing:', error.message);
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({ success: false, message: 'Internal Server Error' }));
+        } finally {
+          // await sql.close();
+        }
+      });
+    }
+
+
+
+
+
+
     else if (req.url=== '/api/updatestallinfo' && req.method === 'POST') {
       let body = '';
       req.on('data', (chunk) => {
@@ -1642,6 +1967,43 @@ const server = http.createServer(async (req, res) => {
 
       const monthlybreakdowns = await sql.query("SELECT MONTH(DateStart)AS MONTH, YEAR(DateStart) AS YEAR, COUNT(IssueRideID) AS BROKE_DOWN_RIDES FROM issue_log GROUP BY MONTH(DateStart), YEAR(DateStart)");
 
+      const rep = await sql.query(`
+      SELECT 
+      SUM(Food_Stall_Revenue) AS Total_Food_Stall_Revenue,
+      SUM(Food_Stall_Expenses) AS Total_Food_Stall_Expenses,
+      SUM(Food_Stall_Profit) AS Total_Food_Stall_Profit,
+      SUM(Merchandise_Revenue) AS Total_Merchandise_Revenue,
+      SUM(Merchandise_Expenses) AS Total_Merchandise_Expenses,
+      SUM(Merchandise_Profit) AS Total_Merchandise_Profit,
+      SUM(Food_Stall_Profit + Merchandise_Profit) AS Grand_Total_Profit
+  FROM (
+      SELECT 
+          fs_agg.Food_Stall_Revenue,
+          fs_agg.Food_Stall_Expenses,
+          fs_agg.Food_Stall_Profit,
+          sh_agg.Merchandise_Revenue,
+          sh_agg.Merchandise_Expenses,
+          sh_agg.Merchandise_Profit
+      FROM 
+          (SELECT 
+               Zone_code, 
+               SUM(Revenue) AS Food_Stall_Revenue, 
+               SUM(Expense) AS Food_Stall_Expenses, 
+               (SUM(Revenue) - SUM(Expense)) AS Food_Stall_Profit 
+           FROM food_stalls 
+           GROUP BY Zone_code) AS fs_agg
+      LEFT JOIN 
+          (SELECT 
+               Zone_code, 
+               SUM(Revenue) AS Merchandise_Revenue, 
+               SUM(Expenses) AS Merchandise_Expenses, 
+               (SUM(Revenue) - SUM(Expenses)) AS Merchandise_Profit 
+           FROM Merchandise 
+           GROUP BY Zone_code) AS sh_agg 
+      ON fs_agg.Zone_code = sh_agg.Zone_code
+  ) AS combined;
+  `);
+
        const responseData = {
         Zone1Data: zone1.recordset,
         Zone2Data: zone2.recordset,
@@ -1696,6 +2058,7 @@ const server = http.createServer(async (req, res) => {
         HelpDeskData: helpdesk.recordset,
         SecurityData: security.recordset,
         EmergencyData: emergency.recordset,
+        REPData: rep.recordset
       };
     
     
@@ -1869,6 +2232,87 @@ const server = http.createServer(async (req, res) => {
       //await sql.close();
     }
   }
+
+
+  else if (req.url=== '/api/handledatecusreport' && req.method === 'POST') {
+    let body = '';
+  
+      req.on('data', (chunk) => {
+        body += chunk;
+      });
+  
+      req.on('end', async () => {
+        try {
+          await sql.connect(config);
+  
+          const { startDate, endDate } = JSON.parse(body);
+  
+  
+         const result = await sql.query(`
+         WITH DateAggregates AS (
+          SELECT
+              MIN(Date) AS MinDate,
+              YEAR(Date) AS Year,
+              DATEPART(WEEK, Date) AS Week,
+              MONTH(Date) AS Month
+          FROM tickets
+          WHERE Date >= '${startDate}' AND Date <= '${endDate}'
+          GROUP BY YEAR(Date), DATEPART(WEEK, Date), MONTH(Date)
+      ),
+      CustomerCounts AS (
+          SELECT
+              CustomerID,
+              COUNT(*) AS TicketCount
+          FROM tickets
+          GROUP BY CustomerID
+          HAVING COUNT(*) > 1
+      )
+      SELECT 
+          'Weekly' AS Frequency,
+          Year,
+          DATEADD(WEEK, Week - 1, DATEADD(YEAR, Year - 1900, 0)) AS startDate,
+          DATEADD(WEEK, Week, DATEADD(YEAR, Year - 1900, 0)) AS endDate,
+          SUM(CASE WHEN tickets.Date = da.MinDate THEN tickets.amount ELSE 0 END) AS NewAmount,
+          SUM(CASE WHEN tickets.Date <> da.MinDate AND cc.CustomerID IS NOT NULL THEN tickets.amount ELSE 0 END) AS OldAmount,
+          SUM(CASE WHEN cc.CustomerID IS NOT NULL THEN tickets.amount ELSE 0 END) AS AllCustomersAmount
+      FROM DateAggregates da
+       
+      JOIN tickets ON YEAR(tickets.Date) = da.Year AND DATEPART(WEEK, tickets.Date) = da.Week
+      LEFT JOIN CustomerCounts cc ON tickets.CustomerID = cc.CustomerID
+      GROUP BY Year, Week, da.MinDate
+      UNION ALL
+      SELECT 
+          'Monthly' AS Frequency,
+          Year,
+          DATEFROMPARTS(Year, Month, 1) AS startDate,
+          DATEADD(MONTH, 1, DATEFROMPARTS(Year, Month, 1)) AS endDate,
+          SUM(CASE WHEN tickets.Date = DATEFROMPARTS(Year, Month, 1) THEN tickets.amount ELSE 0 END) AS NewAmount,
+          SUM(CASE WHEN tickets.Date <> DATEFROMPARTS(Year, Month, 1) AND cc.CustomerID IS NOT NULL THEN tickets.amount ELSE 0 END) AS OldAmount,
+          SUM(CASE WHEN cc.CustomerID IS NOT NULL THEN tickets.amount ELSE 0 END) AS AllCustomersAmount
+      FROM DateAggregates
+      JOIN tickets ON YEAR(tickets.Date) = DateAggregates.Year AND MONTH(tickets.Date) = DateAggregates.Month
+      LEFT JOIN CustomerCounts cc ON tickets.CustomerID = cc.CustomerID
+       
+      GROUP BY Year, Month, DateAggregates.MinDate
+      ORDER BY Year, startDate;
+          `);
+  
+          const responseData = result.recordset;
+  
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify(responseData));
+        } catch (error) {
+          console.error('Error fetching data:', error.message);
+          res.writeHead(500, { 'Content-Type': 'text/plain' });
+          return res.end('Internal Server Error');
+        } finally {
+          //await sql.close();
+        }
+  
+    });
+  }
+
+  
 
   else {
     // Serve static files for React app
