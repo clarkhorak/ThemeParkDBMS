@@ -29,6 +29,22 @@ Your app is ready to be deployed!
 
 See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
+### `Once you are done with a user role, you must sign out with the signout button to move on to the next user role`
+
+### `In the package.json file`
+
+When displaying the webpages through azure:
+in package.json line 29 "start": "concurrently \"npm run start:react\" \"npm run start:server\""
+becomes "start": "concurrently \"npm run build:react\" \"npm run start:server\""
+
+On the local instance it stays as:
+"start": "concurrently \"npm run start:react\" \"npm run start:server\""
+
+## `View updates/changes`
+In the Azure website in order to see changes in some of the tables that get information from the database you must sign out and sign back in. If you try to refresh the page, the connection will be lost. The only page you can refresh in the Azure app is the home page.
+
+On the local instance, you can refresh the page and see the changes immediately.
+
 ## Learn More
 
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
