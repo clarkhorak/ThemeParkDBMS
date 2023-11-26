@@ -64,20 +64,20 @@ const server = http.createServer(async (req, res) => {
   //visitorpage, purch ticket section
 }else if (req.url=== '/api/purchaseTicket' && req.method === 'POST') {
   let body = '';
-
+ 
   req.on('data', (chunk) => {
     body += chunk;
   });
-
+ 
   req.on('end', async () => {
     try {
       await sql.connect(config);
-
+ 
       const { TicketsTypes, Amount, FirstName, LastName, Address, CardInfo, customer_id } = JSON.parse(body);
-
+ 
       const calcPrices = (TicketsTypes) => {
         let Prices = 0;
-
+ 
         switch(TicketsTypes){
           case 'DayPass':
             Prices = 33;
@@ -95,10 +95,10 @@ const server = http.createServer(async (req, res) => {
         return Prices;
       }
       const Prices = calcPrices(TicketsTypes);
-
+ 
       const calcTotal = (TicketsTypes, Amount) => {
         let Total = 0;
-
+ 
         switch(TicketsTypes){
           case 'DayPass':
             Total = Amount * 33;
@@ -116,7 +116,7 @@ const server = http.createServer(async (req, res) => {
         return Total;
       }
       const Total = calcTotal(TicketsTypes, Amount);
-
+ 
       const calcBenefits = (TicketsTypes) => {
         let Benefits = "None"; 
         
@@ -137,7 +137,14 @@ const server = http.createServer(async (req, res) => {
         return Benefits;
       }
       const Benefits = calcBenefits(TicketsTypes);
-
+ 
+      const purchaseDetails = {
+        TicketType: TicketsTypes,
+        Amount: Amount,
+        Total: Total,
+        Date: new Date().toLocaleDateString('en-US'),
+      }
+ 
       await sql.query(`
         INSERT INTO tickets(Ticket_id, CustomerID, Date, TicketType, Benefits, Prices, Amount, Total, first_name, last_name, Address, CardNum)
         VALUES
@@ -145,9 +152,9 @@ const server = http.createServer(async (req, res) => {
         GETDATE(),
          '${TicketsTypes}', '${Benefits}', ${Prices}, ${Amount}, ${Total}, '${FirstName}', '${LastName}', '${Address}', '${CardInfo}');
       `);
-
+ 
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ success: true, message: 'Ticket purchase successful' }));
+      res.end(JSON.stringify({ success: true, message: 'Ticket purchase successful', purchaseDetails}));
     } catch (error) {
       console.error('Error processing ticket purchase:', error.message);
       res.writeHead(500, { 'Content-Type': 'application/json' });
@@ -209,17 +216,17 @@ const server = http.createServer(async (req, res) => {
 //visitorpage, account info section
 } else if (req.url=== '/api/AccountUpdate' && req.method === 'POST') {
   let body = '';
-
+ 
     req.on('data', (chunk) => {
       body += chunk;
     });
-
+ 
     req.on('end', async () => {
       try {
         await sql.connect(config);
-
+ 
         const {CurrentUsername, firstName, lastName, Username, Password, Email, PhoneNum, Address, Payment } = JSON.parse(body);
-
+ 
         await sql.query(`
           UPDATE customer
        
@@ -232,14 +239,25 @@ const server = http.createServer(async (req, res) => {
           phone_number = '${PhoneNum}',
           home_address = '${Address}',
           payment_method = '${Payment}'
-
+ 
           WHERE user_tag = '${CurrentUsername}';
-
+ 
           
         `);
-
+ 
+        const newInfo = {
+          User: Username,
+          firstn: firstName,
+          lastn: lastName,
+          Pass: Password,
+          Email: Email,
+          Phone: PhoneNum,
+          Addr: Address,
+          Pay: Payment,
+        }
+ 
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ success: true, message: 'Account Update Successful' }));
+        res.end(JSON.stringify({ success: true, message: 'Account Update Successful', newInfo }));
       } catch (error) {
         console.error('Error processing account update:', error.message);
         res.writeHead(500, { 'Content-Type': 'application/json' });
@@ -247,7 +265,7 @@ const server = http.createServer(async (req, res) => {
       } finally {
         //await sql.close();
       }
-
+ 
   });
 }
     //VisitorPage, inbox
@@ -1850,85 +1868,6 @@ const server = http.createServer(async (req, res) => {
       // Close the database connection
       //await sql.close();
     }
-  }
-
-
-  else if (req.url=== '/api/business' && req.method === 'POST') {
-    let body = '';
-  
-      req.on('data', (chunk) => {
-        body += chunk;
-      });
-  
-      req.on('end', async () => {
-        try {
-          await sql.connect(config);
-  
-          const { startDate, endDate } = JSON.parse(body);
-  
-  
-         const result = await sql.query(`
-         WITH DateAggregates AS (
-          SELECT
-              MIN(Date) AS MinDate,
-              YEAR(Date) AS Year,
-              DATEPART(WEEK, Date) AS Week,
-              MONTH(Date) AS Month
-          FROM tickets
-          WHERE Date >= '${startDate}' AND Date <= '${endDate}'
-          GROUP BY YEAR(Date), DATEPART(WEEK, Date), MONTH(Date)
-      ),
-      CustomerCounts AS (
-          SELECT
-              CustomerID,
-              COUNT(*) AS TicketCount
-          FROM tickets
-          GROUP BY CustomerID
-          HAVING COUNT(*) > 1
-      )
-      SELECT 
-          'Weekly' AS Frequency,
-          Year,
-          DATEADD(WEEK, Week - 1, DATEADD(YEAR, Year - 1900, 0)) AS startDate,
-          DATEADD(WEEK, Week, DATEADD(YEAR, Year - 1900, 0)) AS endDate,
-          SUM(CASE WHEN tickets.Date = da.MinDate THEN tickets.amount ELSE 0 END) AS NewAmount,
-          SUM(CASE WHEN tickets.Date <> da.MinDate AND cc.CustomerID IS NOT NULL THEN tickets.amount ELSE 0 END) AS OldAmount,
-          SUM(CASE WHEN cc.CustomerID IS NOT NULL THEN tickets.amount ELSE 0 END) AS AllCustomersAmount
-      FROM DateAggregates da
-       
-      JOIN tickets ON YEAR(tickets.Date) = da.Year AND DATEPART(WEEK, tickets.Date) = da.Week
-      LEFT JOIN CustomerCounts cc ON tickets.CustomerID = cc.CustomerID
-      GROUP BY Year, Week, da.MinDate
-      UNION ALL
-      SELECT 
-          'Monthly' AS Frequency,
-          Year,
-          DATEFROMPARTS(Year, Month, 1) AS startDate,
-          DATEADD(MONTH, 1, DATEFROMPARTS(Year, Month, 1)) AS endDate,
-          SUM(CASE WHEN tickets.Date = DATEFROMPARTS(Year, Month, 1) THEN tickets.amount ELSE 0 END) AS NewAmount,
-          SUM(CASE WHEN tickets.Date <> DATEFROMPARTS(Year, Month, 1) AND cc.CustomerID IS NOT NULL THEN tickets.amount ELSE 0 END) AS OldAmount,
-          SUM(CASE WHEN cc.CustomerID IS NOT NULL THEN tickets.amount ELSE 0 END) AS AllCustomersAmount
-      FROM DateAggregates
-      JOIN tickets ON YEAR(tickets.Date) = DateAggregates.Year AND MONTH(tickets.Date) = DateAggregates.Month
-      LEFT JOIN CustomerCounts cc ON tickets.CustomerID = cc.CustomerID
-       
-      GROUP BY Year, Month, DateAggregates.MinDate
-      ORDER BY Year, startDate;
-          `);
-  
-          const responseData = result.recordset;
-  
-          res.writeHead(200, { 'Content-Type': 'application/json' });
-          return res.end(JSON.stringify(responseData));
-        } catch (error) {
-          console.error('Error fetching data:', error.message);
-          res.writeHead(500, { 'Content-Type': 'text/plain' });
-          return res.end('Internal Server Error');
-        } finally {
-          //await sql.close();
-        }
-  
-    });
   }
 
   else {
