@@ -1852,6 +1852,85 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
+
+  else if (req.url=== '/api/business' && req.method === 'POST') {
+    let body = '';
+  
+      req.on('data', (chunk) => {
+        body += chunk;
+      });
+  
+      req.on('end', async () => {
+        try {
+          await sql.connect(config);
+  
+          const { startDate, endDate } = JSON.parse(body);
+  
+  
+         const result = await sql.query(`
+         WITH DateAggregates AS (
+          SELECT
+              MIN(Date) AS MinDate,
+              YEAR(Date) AS Year,
+              DATEPART(WEEK, Date) AS Week,
+              MONTH(Date) AS Month
+          FROM tickets
+          WHERE Date >= '${startDate}' AND Date <= '${endDate}'
+          GROUP BY YEAR(Date), DATEPART(WEEK, Date), MONTH(Date)
+      ),
+      CustomerCounts AS (
+          SELECT
+              CustomerID,
+              COUNT(*) AS TicketCount
+          FROM tickets
+          GROUP BY CustomerID
+          HAVING COUNT(*) > 1
+      )
+      SELECT 
+          'Weekly' AS Frequency,
+          Year,
+          DATEADD(WEEK, Week - 1, DATEADD(YEAR, Year - 1900, 0)) AS startDate,
+          DATEADD(WEEK, Week, DATEADD(YEAR, Year - 1900, 0)) AS endDate,
+          SUM(CASE WHEN tickets.Date = da.MinDate THEN tickets.amount ELSE 0 END) AS NewAmount,
+          SUM(CASE WHEN tickets.Date <> da.MinDate AND cc.CustomerID IS NOT NULL THEN tickets.amount ELSE 0 END) AS OldAmount,
+          SUM(CASE WHEN cc.CustomerID IS NOT NULL THEN tickets.amount ELSE 0 END) AS AllCustomersAmount
+      FROM DateAggregates da
+       
+      JOIN tickets ON YEAR(tickets.Date) = da.Year AND DATEPART(WEEK, tickets.Date) = da.Week
+      LEFT JOIN CustomerCounts cc ON tickets.CustomerID = cc.CustomerID
+      GROUP BY Year, Week, da.MinDate
+      UNION ALL
+      SELECT 
+          'Monthly' AS Frequency,
+          Year,
+          DATEFROMPARTS(Year, Month, 1) AS startDate,
+          DATEADD(MONTH, 1, DATEFROMPARTS(Year, Month, 1)) AS endDate,
+          SUM(CASE WHEN tickets.Date = DATEFROMPARTS(Year, Month, 1) THEN tickets.amount ELSE 0 END) AS NewAmount,
+          SUM(CASE WHEN tickets.Date <> DATEFROMPARTS(Year, Month, 1) AND cc.CustomerID IS NOT NULL THEN tickets.amount ELSE 0 END) AS OldAmount,
+          SUM(CASE WHEN cc.CustomerID IS NOT NULL THEN tickets.amount ELSE 0 END) AS AllCustomersAmount
+      FROM DateAggregates
+      JOIN tickets ON YEAR(tickets.Date) = DateAggregates.Year AND MONTH(tickets.Date) = DateAggregates.Month
+      LEFT JOIN CustomerCounts cc ON tickets.CustomerID = cc.CustomerID
+       
+      GROUP BY Year, Month, DateAggregates.MinDate
+      ORDER BY Year, startDate;
+          `);
+  
+          const responseData = result.recordset;
+  
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify(responseData));
+        } catch (error) {
+          console.error('Error fetching data:', error.message);
+          res.writeHead(500, { 'Content-Type': 'text/plain' });
+          return res.end('Internal Server Error');
+        } finally {
+          //await sql.close();
+        }
+  
+    });
+  }
+
   else {
     // Serve static files for React app
     serveStaticFile(req, res);
