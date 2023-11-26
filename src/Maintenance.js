@@ -677,8 +677,8 @@ const navigate = useNavigate();
 
 const signOut = () => {
   localStorage.removeItem("authenticatedM");
-  localStorage.removeItem("nameM");
-  navigate("/"); //Navigate back to main page
+  localStorage.removeItem("idM");
+  navigate("/");
 };
 
 function GetEmpObj() {
