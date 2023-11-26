@@ -281,7 +281,7 @@ function Visitorpage() {
               <button className="ParkInfoButton"onClick={() => showSection('section3')}>
                 Park Information
               </button>
-              <button className="DeleteButton" onClick={() => showSection('section4')}>
+              <button className="DeleteButtonAcc" onClick={() => showSection('section4')}>
               Delete Account
               </button>
               <button className="InboxButton" onClick={() => showSection('section5')}>
