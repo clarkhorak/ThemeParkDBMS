@@ -2193,13 +2193,11 @@ const server = http.createServer(async (req, res) => {
 
   else if (req.url === '/api/customer' && req.method === 'GET') {
     try {
-      // Connect to the database
+     
       await sql.connect(config);
  
-      // Query to fetch data from the login table
       const result = await sql.query('SELECT * FROM customer');
- 
-      // Send the data as JSON
+     
        res.writeHead(200, { 'Content-Type': 'application/json' });
        return res.end(JSON.stringify(result.recordset));
     } catch (error) {
@@ -2207,20 +2205,19 @@ const server = http.createServer(async (req, res) => {
        res.writeHead(500, { 'Content-Type': 'text/plain' });
        return res.end('Internal Server Error');
     } finally {
-      // Close the database connection
+     
       //await sql.close();
     }
   }
 
   else if (req.url === '/api/employee' && req.method === 'GET') {
     try {
-      // Connect to the database
+
       await sql.connect(config);
  
-      // Query to fetch data from the login table
+  
       const result = await sql.query('SELECT * FROM employee');
  
-      // Send the data as JSON
        res.writeHead(200, { 'Content-Type': 'application/json' });
        return res.end(JSON.stringify(result.recordset));
     } catch (error) {
@@ -2228,7 +2225,7 @@ const server = http.createServer(async (req, res) => {
        res.writeHead(500, { 'Content-Type': 'text/plain' });
        return res.end('Internal Server Error');
     } finally {
-      // Close the database connection
+
       //await sql.close();
     }
   }
@@ -2315,7 +2312,7 @@ const server = http.createServer(async (req, res) => {
   
 
   else {
-    // Serve static files for React app
+   
     serveStaticFile(req, res);
     }
   });
@@ -2325,7 +2322,7 @@ server.listen(port, () => {
 });
 
 function serveStaticFile(req, res) {
-  const filePath = req.url === '/' ? 'build/index.html' : path.join(__dirname, 'build', req.url); //important
+  const filePath = req.url === '/' ? 'build/index.html' : path.join(__dirname, 'build', req.url); 
   const contentType = getContentType(filePath);
 
   fs.readFile(filePath, (err, data) => {
@@ -2339,7 +2336,7 @@ function serveStaticFile(req, res) {
   });
 }
 
-// Function to determine the content type based on file extension
+
 function getContentType(filePath) {
   const extname = path.extname(filePath);
   switch (extname) {
