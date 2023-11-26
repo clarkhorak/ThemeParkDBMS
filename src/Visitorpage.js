@@ -48,7 +48,7 @@ function Visitorpage() {
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
-  
+  const[purchaseDetails, setPurchaseDetails] = useState(null);
   const handlePurchaseTicket = async (event) => {
     event.preventDefault();
 
@@ -74,11 +74,15 @@ function Visitorpage() {
       const result = await response.json();
       console.log(result); 
       form.reset();
-
+      if(result.success){
+        const newpurchaseDetails = result.purchaseDetails;
+        setPurchaseDetails(newpurchaseDetails);
+      }
     } catch (error) {
       console.error('Error submitting form:', error);
     }
   };
+
 
   const AccountDelete = async (event) => {
     event.preventDefault();
@@ -103,14 +107,14 @@ function Visitorpage() {
       console.log(result); 
       form.reset();
       setUserInfoBeforeDeletion(result.userInfoBeforeDeletion);
-
+  
     } catch (error) {
       console.error('Error submitting form:', error);
     }
   };
 
  
-
+  const[newInfo, setnewInfo] = useState(null);
   const AccountUpdate = async (event) => {
     event.preventDefault();
 
@@ -133,7 +137,10 @@ function Visitorpage() {
       const result = await response.json();
       console.log(result); 
       form.reset();
-
+      if(result.success){
+        const newuserInfo = result.newInfo;
+        setnewInfo(newuserInfo);
+      }
       
     } catch (error) {
       console.error('Error submitting form:', error);
@@ -371,10 +378,24 @@ function Visitorpage() {
                               <button id="UpdateAccInfoButton" type="submit">Submit</button>
                           
                       </form>
-                      <p> If you would like to see your updated information, refresh the page.
-                  </p>
+                      <p> If you would like to see your updated information in the user information table, refresh the page.
+                     </p>
                    </div>
-                   
+                   {newInfo && (
+                        
+                        <div>
+                          <h2>Update Account Successful!</h2>
+                          <p>User: {newInfo.User}</p>
+                          <p>First name: {newInfo.firstn}</p>
+                          <p>Last name: {newInfo.lastn}</p>
+                          <p>Password: {newInfo.Pass}</p>             
+                          <p>Email: {newInfo.Email}</p>
+                          <p>Phone: ${newInfo.Phone}</p>
+                          <p>Address: {newInfo.Addr}</p>
+                          <p>Payment: {newInfo.Pay}</p>
+
+                        </div>
+                      )}
                   </div>
               </div>
             </div>
@@ -455,9 +476,21 @@ function Visitorpage() {
                          
 
                       </form>
+                      {purchaseDetails && (
+                        
+                      <div>
+                        <h2>Ticket Purchase Successful!</h2>
+                        <p>Ticket Type: {purchaseDetails.TicketType}</p>
+                        <p>Amount: {purchaseDetails.Amount}</p>
+                        <p>Total: ${purchaseDetails.Total}</p>
+                        <p>Date: {purchaseDetails.Date}</p>
+
+                      </div>
+                    )}
+                      
                   <div>
 
-                <h3>Purchase History</h3>
+                <h2>Purchase History</h2>
                 <table>
                     <thead>
                       <tr>

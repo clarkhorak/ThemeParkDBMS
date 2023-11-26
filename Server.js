@@ -1557,6 +1557,14 @@ const server = http.createServer(async (req, res) => {
       }
       const Benefits = calcBenefits(TicketsTypes);
 
+      const purchaseDetails = {
+        TicketType: TicketsTypes,
+        Amount: Amount,
+        Total: Total,
+        Date: new Date().toLocaleDateString('en-US'),
+      }
+
+
       await sql.query(`
         INSERT INTO tickets(Ticket_id, CustomerID, Date, TicketType, Benefits, Prices, Amount, Total, first_name, last_name, Address, CardNum)
         VALUES
@@ -1566,7 +1574,7 @@ const server = http.createServer(async (req, res) => {
       `);
 
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ success: true, message: 'Ticket purchase successful' }));
+      res.end(JSON.stringify({ success: true, message: 'Ticket purchase successful', purchaseDetails}));
     } catch (error) {
       console.error('Error processing ticket purchase:', error.message);
       res.writeHead(500, { 'Content-Type': 'application/json' });
@@ -1657,8 +1665,20 @@ const server = http.createServer(async (req, res) => {
           
         `);
 
+
+        const newInfo = {
+          User: Username,
+          firstn: firstName,
+          lastn: lastName,
+          Pass: Password,
+          Email: Email,
+          Phone: PhoneNum,
+          Addr: Address,
+          Pay: Payment,
+        }
+
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ success: true, message: 'Account Update Successful' }));
+        res.end(JSON.stringify({ success: true, message: 'Account Update Successful', newInfo }));
       } catch (error) {
         console.error('Error processing account update:', error.message);
         res.writeHead(500, { 'Content-Type': 'application/json' });
