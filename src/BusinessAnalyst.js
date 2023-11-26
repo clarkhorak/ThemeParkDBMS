@@ -279,13 +279,13 @@ const navigate = useNavigate();
 
 const signOut = () => {
   localStorage.removeItem("authenticatedB");
-  localStorage.removeItem("idB");
-  navigate("/");
+  localStorage.removeItem("nameB");
+  navigate("/"); //Navigate back to main page
 };
 
 function GetEmpObj() {
   for (const obj of StaffData) {
-    if (obj.employee_id === localStorage.getItem("idB")) {
+    if (obj.first_name === localStorage.getItem("nameB")) {
       return (
           <div key={obj.employee_id}>
             <h3>
@@ -323,16 +323,6 @@ function GetEmpObj() {
   }
 }
 
-function ReturnEmployeeName() {
-  for (const obj of StaffData) {
-    if(obj.employee_id == localStorage.getItem("idB")) {
-      return (
-        <div>Welcome back, {obj.first_name}!</div>
-      );
-    }
-  }
-}
-
 
 if (localStorage.getItem("authenticatedB") === false || localStorage.getItem("authenticatedB") == null) {
   console.log("Unsuccessful login");
@@ -353,7 +343,7 @@ else{
       </ul>
       {StaffData.map((employee) => (
         <div className="welcome-back-employee" key={employee.id}>
-          <ReturnEmployeeName />
+          Welcome back, {localStorage.getItem("nameB")}!
         </div>
         ))}
         <div className="visitortype">
@@ -1130,8 +1120,8 @@ else{
                               <label for="Revenue">Revenue:  </label>
                               <input type="int" id="Revenue" name="Revenue" required/>
 
-                              <label for="Expenses">Expense:  </label>
-                              <input type="int" id="Expenses" name="Expenses" required/>
+                              <label for="Expense">Expense:  </label>
+                              <input type="int" id="Expense" name="Expense" required/>
 
                               <label for="Profit">Profit:  </label>
                               <input type="int" id="Profit" name="Profit" required/>
