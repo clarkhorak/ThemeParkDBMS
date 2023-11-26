@@ -325,7 +325,7 @@ function GetEmpObj() {
 
 function ReturnEmployeeName() {
   for (const obj of StaffData) {
-    if(obj.employee_id == localStorage.getItem("idM")) {
+    if(obj.employee_id == localStorage.getItem("idB")) {
       return (
         <div>Welcome back, {obj.first_name}!</div>
       );
