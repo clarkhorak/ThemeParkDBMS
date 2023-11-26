@@ -1354,7 +1354,7 @@ const server = http.createServer(async (req, res) => {
           ProductAmount = '${ProductAmount}',
           Status = '${Stat}',
           Revenue = ${Revenue},
-          Expense = ${Expenses},
+          Expenses = ${Expenses},
           Profit = ${Profit}
           WHERE Shop_id = '${Shop_id}' AND Zone_code = '${Zone}';
           `);
