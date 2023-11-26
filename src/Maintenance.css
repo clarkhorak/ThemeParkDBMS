@@ -166,7 +166,7 @@ button {
   cursor: pointer;
 }
 
-.zoneridebutton{
+.zonesectionbutton, .issuelogbutton, .injurycasebutton{
   border: 1px solid black;
   margin-bottom: 10px;
   margin-right: 10px;
@@ -220,4 +220,3 @@ input{
 #UpdateAccButton:hover{
   background-color: #580808;
 }
-
