@@ -15,7 +15,271 @@ const path = require('path');
     }
 ;
 const server = http.createServer(async (req, res) => {
-  if (req.url=== '/api/updateemppass' && req.method === 'POST') {
+ 
+  //VisitorPage, park info
+ if (req.url === '/api/ride' && req.method === 'GET') {
+    try {
+
+      await sql.connect(config);
+ 
+
+      const result = await sql.query("\
+      SELECT ride_info.RideName, ride_info.Description \
+      FROM ride_info \
+      WHERE ride_info.Accessibility_Attraction = 'Available'\
+    ");
+
+
+     const resultTest = await sql.query("SELECT ride_info.RideName AS InactiveRide, ride_info.Description AS InactiveDescript\
+     FROM ride_info \
+     WHERE ride_info.OperationStatus = 'Inactive'\ ");
+
+
+     const userInfotest = await sql.query("\
+     select customer.customer_id, customer.first_name, customer.last_name, customer.user_pass, customer.user_tag, customer.phone_number, customer.email,customer.payment_method,customer.home_address FROM customer \
+   ");
+
+    const userTicketsInfo = await sql.query("\
+    select * from tickets ");
+
+     const responseData = {
+      RideData: result.recordset,
+      InactiveRides: resultTest.recordset,
+      userInfo: userInfotest.recordset,
+      TicketInfo: userTicketsInfo.recordset
+    };
+
+
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(responseData));
+    } catch (error) {
+      console.error('Error fetching data:', error.message);
+      res.writeHead(500, { 'Content-Type': 'text/plain' });
+      res.end('Internal Server Error');
+    } finally {
+   
+      //await sql.close();
+    }
+
+  //visitorpage, purch ticket section
+}else if (req.url=== '/api/purchaseTicket' && req.method === 'POST') {
+  let body = '';
+
+  req.on('data', (chunk) => {
+    body += chunk;
+  });
+
+  req.on('end', async () => {
+    try {
+      await sql.connect(config);
+
+      const { TicketsTypes, Amount, FirstName, LastName, Address, CardInfo, customer_id } = JSON.parse(body);
+
+      const calcPrices = (TicketsTypes) => {
+        let Prices = 0;
+
+        switch(TicketsTypes){
+          case 'DayPass':
+            Prices = 33;
+          break;
+          case 'SeasonalPass':
+            Prices = 61;
+          break;
+          case 'AnnualPass':
+            Prices = 151;
+          break;
+          case 'PremiumPass':
+            Prices = 351;
+          break;
+        }
+        return Prices;
+      }
+      const Prices = calcPrices(TicketsTypes);
+
+      const calcTotal = (TicketsTypes, Amount) => {
+        let Total = 0;
+
+        switch(TicketsTypes){
+          case 'DayPass':
+            Total = Amount * 33;
+          break;
+          case 'SeasonalPass':
+            Total = Amount * 61;
+          break;
+          case 'AnnualPass':
+            Total = Amount * 151;
+          break;
+          case 'PremiumPass':
+            Total = Amount * 351;
+          break;
+        }
+        return Total;
+      }
+      const Total = calcTotal(TicketsTypes, Amount);
+
+      const calcBenefits = (TicketsTypes) => {
+        let Benefits = "None"; 
+        
+        switch(TicketsTypes){
+          case 'DayPass':
+            Benefits = "Ride Photos or Souvenirs";
+          break;
+          case 'SeasonalPass':
+            Benefits = "Special Shows or Entertainment";
+          break;
+          case 'AnnualPass':
+            Benefits = "Discounts on Merchandise & Dining plan";
+          break;
+          case 'PremiumPass':
+            Benefits = "Fast Pass";
+          break;
+        }
+        return Benefits;
+      }
+      const Benefits = calcBenefits(TicketsTypes);
+
+      await sql.query(`
+        INSERT INTO tickets(Ticket_id, CustomerID, Date, TicketType, Benefits, Prices, Amount, Total, first_name, last_name, Address, CardNum)
+        VALUES
+        (CONCAT('Tick', SUBSTRING(CONVERT(VARCHAR(255), NEWID()), 1, 4)), '${customer_id}',
+        GETDATE(),
+         '${TicketsTypes}', '${Benefits}', ${Prices}, ${Amount}, ${Total}, '${FirstName}', '${LastName}', '${Address}', '${CardInfo}');
+      `);
+
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: true, message: 'Ticket purchase successful' }));
+    } catch (error) {
+      console.error('Error processing ticket purchase:', error.message);
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, message: 'Internal Server Error' }));
+    } finally {
+      //await sql.close();
+    }
+  });
+
+  //visitorpage delete account section
+} else if (req.url=== '/api/AccountDelete' && req.method === 'POST') {
+  let body = '';
+
+    req.on('data', (chunk) => {
+      body += chunk;
+    });
+
+    req.on('end', async () => {
+      try {
+        await sql.connect(config);
+
+        const {firstName, lastName, Username, Password, Email } = JSON.parse(body);
+
+
+       const result = await sql.query(`
+          Select * from customer
+          WHERE
+          first_name = '${firstName}' AND
+          last_name = '${lastName}' AND
+          user_tag = '${Username}' AND
+          user_pass = '${Password}' AND
+          email = '${Email}'
+        `);
+
+        const userInfoBeforeDeletion = result.recordset[0];
+
+        await sql.query(`
+        delete from customer
+        WHERE
+        first_name = '${firstName}' AND
+        last_name = '${lastName}' AND
+        user_tag = '${Username}' AND
+        user_pass = '${Password}' AND
+        email = '${Email}'
+      `);
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, message: 'Account Delete Successful', userInfoBeforeDeletion}));
+      } catch (error) {
+        console.error('Error processing account deletion:', error.message);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, message: 'Internal Server Error' }));
+      } finally {
+        //await sql.close();
+      }
+
+  });
+
+//visitorpage, account info section
+} else if (req.url=== '/api/AccountUpdate' && req.method === 'POST') {
+  let body = '';
+
+    req.on('data', (chunk) => {
+      body += chunk;
+    });
+
+    req.on('end', async () => {
+      try {
+        await sql.connect(config);
+
+        const {CurrentUsername, firstName, lastName, Username, Password, Email, PhoneNum, Address, Payment } = JSON.parse(body);
+
+        await sql.query(`
+          UPDATE customer
+       
+          SET 
+          first_name = '${firstName}',
+          last_name = '${lastName}',
+          user_tag = '${Username}',
+          user_pass = '${Password}',
+          email = '${Email}',
+          phone_number = '${PhoneNum}',
+          home_address = '${Address}',
+          payment_method = '${Payment}'
+
+          WHERE user_tag = '${CurrentUsername}';
+
+          
+        `);
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, message: 'Account Update Successful' }));
+      } catch (error) {
+        console.error('Error processing account update:', error.message);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, message: 'Internal Server Error' }));
+      } finally {
+        //await sql.close();
+      }
+
+  });
+}
+    //VisitorPage, inbox
+    else if (req.url === '/api/inbox' && req.method === 'GET') {
+      try {
+
+        await sql.connect(config);
+
+
+        const result = await sql.query("\
+        SELECT * from Inbox \
+      ");
+
+      const responseData = {
+        InboxData: result.recordset,
+
+      };
+
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(responseData));
+      } catch (error) {
+        console.error('Error fetching data:', error.message);
+        res.writeHead(500, { 'Content-Type': 'text/plain' });
+        res.end('Internal Server Error');
+      } finally {
+    
+        //await sql.close();
+      }
+}
+  
+  else if (req.url=== '/api/updateemppass' && req.method === 'POST') {
     let body = '';
     req.on('data', (chunk) => {
       body += chunk;
@@ -104,43 +368,6 @@ const server = http.createServer(async (req, res) => {
     });
   }
 
-  else if (req.url === '/api/injuryreport' && req.method === 'GET') {
-    try {
-      await sql.connect(config);
-  
-      const result = await sql.query(`
-        SELECT 
-          ride_info.RideName,
-          DATEPART(YEAR, injury_case.[Date]) AS [Year],
-          DATEPART(MONTH, injury_case.[Date]) AS [Month],
-          DATEPART(WEEK, injury_case.[Date]) AS [Week],
-          AVG(injury_case.AmountInjured) AS AvgInjured,
-          COUNT(issue_log.issueRideID) AS Breakdowns
-        FROM 
-          injury_case
-        LEFT JOIN issue_log ON injury_case.RideID = issue_log.IssueRideID
-        LEFT JOIN ride_info ON injury_case.RideID = ride_info.RideID
-        GROUP BY 
-          ride_info.RideName,
-          DATEPART(YEAR, injury_case.[Date]),
-          DATEPART(MONTH, injury_case.[Date]),
-          DATEPART(WEEK, injury_case.[Date])
-        ORDER BY 
-          [Year], [Month], [Week], ride_info.RideName;
-      `);
-      // ... rest of your code
-  
-
-       res.writeHead(200, { 'Content-Type': 'application/json' });
-       return res.end(JSON.stringify(result.recordset));
-    } catch (error) {
-      console.error('Error fetching data:', error.message);
-       res.writeHead(500, { 'Content-Type': 'text/plain' });
-       return res.end('Internal Server Error');
-    } finally {
-    // await sql.close();
-    }
-  }
  else if (req.url=== '/api/updateemppass' && req.method === 'POST') {
       let body = '';
       req.on('data', (chunk) => {
@@ -166,6 +393,66 @@ const server = http.createServer(async (req, res) => {
         }
       });
     }
+
+    else if (req.url=== '/api/handleaddissuelog' && req.method === 'POST') {
+      let body = '';
+      req.on('data', (chunk) => {
+        body += chunk;
+      });
+      req.on('end', async () => {
+        try {
+          await sql.connect(config);
+          const { IssueRideID, DateStart, DateFixed, CostToFix, Reason, FixedBy, OperatingStat } = JSON.parse(body);
+          
+          await sql.query(`
+            INSERT INTO issue_log (LogIssueID, IssueRideID, DateStart, DateFixed, CostToFix, Reason, FixedBy, OperatingStat)
+            VALUES (CONCAT('ILOG', SUBSTRING(CONVERT(VARCHAR(255), NEWID()), 1, 4)), '${IssueRideID}', '${DateStart}', '${DateFixed}', ${CostToFix}, '${Reason}', '${FixedBy}', '${OperatingStat}');
+          `);
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({ success: true, message: 'Added Information successfully' }));
+        } catch (error) {
+          console.error('Error processing:', error.message);
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({ success: false, message: 'Internal Server Error' }));
+        } finally {
+          // await sql.close();
+        }
+      });
+    }
+
+    else if (req.url=== '/api/handleupdateissuelog' && req.method === 'POST') {
+      let body = '';
+      req.on('data', (chunk) => {
+        body += chunk;
+      });
+      req.on('end', async () => {
+        try {
+          await sql.connect(config);
+          const { LogIssueID, IssueRideID, DateStart, DateFixed, CostToFix, Reason, FixedBy, OperatingStat } = JSON.parse(body);
+          
+          await sql.query(`
+            UPDATE issue_log
+            SET LogIssueID = '${LogIssueID}',
+            IssueRideID = '${IssueRideID}',
+            DateStart = '${DateStart}',
+            DateFixed = '${DateFixed}',
+            CostToFix = ${CostToFix},
+            Reason = '${Reason}',
+            FixedBy = '${FixedBy}',
+            OperatingStat = '${OperatingStat}';
+          `);
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({ success: true, message: 'Added Information successfully' }));
+        } catch (error) {
+          console.error('Error processing:', error.message);
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({ success: false, message: 'Internal Server Error' }));
+        } finally {
+          // await sql.close();
+        }
+      });
+    }
+
     else if (req.url=== '/api/addeventinfo' && req.method === 'POST') {
       let body = '';
       req.on('data', (chunk) => {
@@ -985,7 +1272,37 @@ const server = http.createServer(async (req, res) => {
           
           await sql.query(`
           INSERT INTO injury_case
-          VALUES (CONCAT('INJ', SUBSTRING(CONVERT(VARCHAR(255), NEWID()), 1, 4)), '${RideID}', '${Date}', ${SeverityScale}, ${AmountInjured});
+          VALUES (CONCAT('INJ', SUBSTRING(CONVERT(VARCHAR(255), NEWID()), 1, 4)), '${RideID}', '${Date}', '${SeverityScale}', ${AmountInjured});
+          `);
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({ success: true, message: 'Updated Information successfully' }));
+        } catch (error) {
+          console.error('Error processing:', error.message);
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({ success: false, message: 'Internal Server Error' }));
+        } finally {
+          // await sql.close();
+        }
+      });
+    }
+
+    else if (req.url=== '/api/handleupdateinjury' && req.method === 'POST') {
+      let body = '';
+      req.on('data', (chunk) => {
+        body += chunk;
+      });
+      req.on('end', async () => {
+        try {
+          await sql.connect(config);
+          const { InjuryCaseID, RideID, Date, SeverityScale, AmountInjured } = JSON.parse(body);
+          
+          await sql.query(`
+          UPDATE injury_case
+          SET InjuryCaseID = '${InjuryCaseID}',
+          RideID = '${RideID}',
+          Date = '${Date}',
+          SeverityScale = '${SeverityScale}',
+          AmountInjured = ${AmountInjured};
           `);
           res.writeHead(200, { 'Content-Type': 'application/json' });
           return res.end(JSON.stringify({ success: true, message: 'Updated Information successfully' }));
@@ -1303,36 +1620,10 @@ const server = http.createServer(async (req, res) => {
       FROM emergency; \
       ");
 
-      const injurycase = await sql.query("\
-      SELECT * \
-      FROM injury_case; \
-      ");
-
       const maintenancestaff = await sql.query("SELECT * FROM employee");
 
       const monthlybreakdowns = await sql.query("SELECT MONTH(DateStart)AS MONTH, YEAR(DateStart) AS YEAR, COUNT(IssueRideID) AS BROKE_DOWN_RIDES FROM issue_log GROUP BY MONTH(DateStart), YEAR(DateStart)");
 
-      const injuryreport = await sql.query(`
-      SELECT 
-        ride_info.RideName,
-        DATEPART(YEAR, injury_case.[Date]) AS [Year],
-        DATEPART(MONTH, injury_case.[Date]) AS [Month],
-        DATEPART(WEEK, injury_case.[Date]) AS [Week],
-        AVG(injury_case.AmountInjured) AS AvgInjured,
-        COUNT(issue_log.issueRideID) AS Breakdowns
-      FROM 
-        injury_case
-      LEFT JOIN issue_log ON injury_case.RideID = issue_log.IssueRideID
-      LEFT JOIN ride_info ON injury_case.RideID = ride_info.RideID
-      GROUP BY 
-        ride_info.RideName,
-        DATEPART(YEAR, injury_case.[Date]),
-        DATEPART(MONTH, injury_case.[Date]),
-        DATEPART(WEEK, injury_case.[Date])
-      ORDER BY 
-        [Year], [Month], [Week], ride_info.RideName;
-    `);
-       
        const responseData = {
         Zone1Data: zone1.recordset,
         Zone2Data: zone2.recordset,
@@ -1382,13 +1673,11 @@ const server = http.createServer(async (req, res) => {
         InactiveService2Data: inactiveservice2.recordset,
         InactiveService3Data: inactiveservice3.recordset,
         InactiveService4Data: inactiveservice4.recordset,
-        InjuryReportData: injuryreport.recordset,
         BreakdownData: monthlybreakdowns.recordset,
         StaffData: maintenancestaff.recordset,
         HelpDeskData: helpdesk.recordset,
         SecurityData: security.recordset,
         EmergencyData: emergency.recordset,
-        InjuryCaseData: injurycase.recordset
       };
     
     
@@ -1404,300 +1693,122 @@ const server = http.createServer(async (req, res) => {
       }
     }
 
-    else if (req.url === '/api/handledateissuelog' && req.method === 'GET') {
-      const parsedUrl = url.parse(req.url, true);
-      const { DateStart, DateFixed } = parsedUrl.query;
+    else if (req.url=== '/api/handledateissuelog' && req.method === 'POST') {
+      let body = '';
     
-      try {
-        // Check if both parameters are present
-        if (!DateStart || !DateFixed) {
-          res.writeHead(400, { 'Content-Type': 'application/json' });
-          return res.end(JSON.stringify({ error: 'Both DateStart and DateFixed are required.' }));
-        }
+        req.on('data', (chunk) => {
+          body += chunk;
+        });
     
-        // Use parameterized queries to prevent SQL injection
-        const result = await sql.query`
-          SELECT *
-          FROM issue_log
-          WHERE DateStart >= @DateStart AND DateFixed <= @DateFixed;
-        `.input('DateStart', DateStart).input('DateFixed', DateFixed);
+        req.on('end', async () => {
+          try {
+            await sql.connect(config);
     
-        const responseData = result.recordset;
+            const { DateStart, DateFixed } = JSON.parse(body);
     
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        return res.end(JSON.stringify(responseData));
-      } catch (error) {
-        console.error('Error fetching data:', error.message);
-        res.writeHead(500, { 'Content-Type': 'application/json' });
-        return res.end(JSON.stringify({ error: 'Internal Server Error' }));
-      } finally {
-        // Close the SQL pool properly
-        // await sql.close();
-      }
-    }
-  //VisitorPage, park info
-  else if (req.url === '/api/ride' && req.method === 'GET') {
-    try {
-
-      await sql.connect(config);
- 
-
-      const result = await sql.query("\
-      SELECT ride_info.RideName, ride_info.Description \
-      FROM ride_info \
-      WHERE ride_info.Accessibility_Attraction = 'Available'\
-    ");
-
-
-     const resultTest = await sql.query("SELECT ride_info.RideName AS InactiveRide, ride_info.Description AS InactiveDescript\
-     FROM ride_info \
-     WHERE ride_info.OperationStatus = 'Inactive'\ ");
-
-
-     const userInfotest = await sql.query("\
-     select customer.customer_id, customer.first_name, customer.last_name, customer.user_pass, customer.user_tag, customer.phone_number, customer.email,customer.payment_method,customer.home_address FROM customer \
-   ");
-
-    const userTicketsInfo = await sql.query("\
-    select * from tickets ");
-
-     const responseData = {
-      RideData: result.recordset,
-      InactiveRides: resultTest.recordset,
-      userInfo: userInfotest.recordset,
-      TicketInfo: userTicketsInfo.recordset
-    };
-
-
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify(responseData));
-    } catch (error) {
-      console.error('Error fetching data:', error.message);
-      res.writeHead(500, { 'Content-Type': 'text/plain' });
-      res.end('Internal Server Error');
-    } finally {
-   
-      //await sql.close();
+    
+           const result = await sql.query(`
+              SELECT * FROM issue_log WHERE DateStart >= '${DateStart}' AND DateFixed <= '${DateFixed}';
+            `);
+    
+            const responseData = result.recordset;
+    
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            return res.end(JSON.stringify(responseData));
+          } catch (error) {
+            console.error('Error fetching data:', error.message);
+            res.writeHead(500, { 'Content-Type': 'text/plain' });
+            return res.end('Internal Server Error');
+          } finally {
+            //await sql.close();
+          }
+    
+      });
     }
 
-  //visitorpage, purch ticket section
-}else if (req.url=== '/api/purchaseTicket' && req.method === 'POST') {
-  let body = '';
-
-  req.on('data', (chunk) => {
-    body += chunk;
-  });
-
-  req.on('end', async () => {
-    try {
-      await sql.connect(config);
-
-      const { TicketsTypes, Amount, FirstName, LastName, Address, CardInfo, customer_id } = JSON.parse(body);
-
-      const calcPrices = (TicketsTypes) => {
-        let Prices = 0;
-
-        switch(TicketsTypes){
-          case 'DayPass':
-            Prices = 33;
-          break;
-          case 'SeasonalPass':
-            Prices = 61;
-          break;
-          case 'AnnualPass':
-            Prices = 151;
-          break;
-          case 'PremiumPass':
-            Prices = 351;
-          break;
-        }
-        return Prices;
-      }
-      const Prices = calcPrices(TicketsTypes);
-
-      const calcTotal = (TicketsTypes, Amount) => {
-        let Total = 0;
-
-        switch(TicketsTypes){
-          case 'DayPass':
-            Total = Amount * 33;
-          break;
-          case 'SeasonalPass':
-            Total = Amount * 61;
-          break;
-          case 'AnnualPass':
-            Total = Amount * 151;
-          break;
-          case 'PremiumPass':
-            Total = Amount * 351;
-          break;
-        }
-        return Total;
-      }
-      const Total = calcTotal(TicketsTypes, Amount);
-
-      const calcBenefits = (TicketsTypes) => {
-        let Benefits = "None"; 
-        
-        switch(TicketsTypes){
-          case 'DayPass':
-            Benefits = "Ride Photos or Souvenirs";
-          break;
-          case 'SeasonalPass':
-            Benefits = "Special Shows or Entertainment";
-          break;
-          case 'AnnualPass':
-            Benefits = "Discounts on Merchandise & Dining plan";
-          break;
-          case 'PremiumPass':
-            Benefits = "Fast Pass";
-          break;
-        }
-        return Benefits;
-      }
-      const Benefits = calcBenefits(TicketsTypes);
-
-      await sql.query(`
-        INSERT INTO tickets(Ticket_id, CustomerID, Date, TicketType, Benefits, Prices, Amount, Total, first_name, last_name, Address, CardNum)
-        VALUES
-        (CONCAT('Tick', SUBSTRING(CONVERT(VARCHAR(255), NEWID()), 1, 4)), '${customer_id}',
-        GETDATE(),
-         '${TicketsTypes}', '${Benefits}', ${Prices}, ${Amount}, ${Total}, '${FirstName}', '${LastName}', '${Address}', '${CardInfo}');
-      `);
-
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ success: true, message: 'Ticket purchase successful' }));
-    } catch (error) {
-      console.error('Error processing ticket purchase:', error.message);
-      res.writeHead(500, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ success: false, message: 'Internal Server Error' }));
-    } finally {
-      //await sql.close();
-    }
-  });
-
-  //visitorpage delete account section
-} else if (req.url=== '/api/AccountDelete' && req.method === 'POST') {
-  let body = '';
-
-    req.on('data', (chunk) => {
-      body += chunk;
-    });
-
-    req.on('end', async () => {
-      try {
-        await sql.connect(config);
-
-        const {firstName, lastName, Username, Password, Email } = JSON.parse(body);
-
-
-       const result = await sql.query(`
-          Select * from customer
-          WHERE
-          first_name = '${firstName}' AND
-          last_name = '${lastName}' AND
-          user_tag = '${Username}' AND
-          user_pass = '${Password}' AND
-          email = '${Email}'
-        `);
-
-        const userInfoBeforeDeletion = result.recordset[0];
-
-        await sql.query(`
-        delete from customer
-        WHERE
-        first_name = '${firstName}' AND
-        last_name = '${lastName}' AND
-        user_tag = '${Username}' AND
-        user_pass = '${Password}' AND
-        email = '${Email}'
-      `);
-
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ success: true, message: 'Account Delete Successful', userInfoBeforeDeletion}));
-      } catch (error) {
-        console.error('Error processing account deletion:', error.message);
-        res.writeHead(500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ success: false, message: 'Internal Server Error' }));
-      } finally {
-        //await sql.close();
-      }
-
-  });
-
-//visitorpage, account info section
-} else if (req.url=== '/api/AccountUpdate' && req.method === 'POST') {
-  let body = '';
-
-    req.on('data', (chunk) => {
-      body += chunk;
-    });
-
-    req.on('end', async () => {
-      try {
-        await sql.connect(config);
-
-        const {CurrentUsername, firstName, lastName, Username, Password, Email, PhoneNum, Address, Payment } = JSON.parse(body);
-
-        await sql.query(`
-          UPDATE customer
-       
-          SET 
-          first_name = '${firstName}',
-          last_name = '${lastName}',
-          user_tag = '${Username}',
-          user_pass = '${Password}',
-          email = '${Email}',
-          phone_number = '${PhoneNum}',
-          home_address = '${Address}',
-          payment_method = '${Payment}'
-
-          WHERE user_tag = '${CurrentUsername}';
-
-          
-        `);
-
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ success: true, message: 'Account Update Successful' }));
-      } catch (error) {
-        console.error('Error processing account update:', error.message);
-        res.writeHead(500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ success: false, message: 'Internal Server Error' }));
-      } finally {
-        //await sql.close();
-      }
-
-  });
-}
-    //VisitorPage, inbox
-    else if (req.url === '/api/inbox' && req.method === 'GET') {
-      try {
-
-        await sql.connect(config);
-
-
-        const result = await sql.query("\
-        SELECT * from Inbox \
-      ");
-
-      const responseData = {
-        InboxData: result.recordset,
-
-      };
-
-
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify(responseData));
-      } catch (error) {
-        console.error('Error fetching data:', error.message);
-        res.writeHead(500, { 'Content-Type': 'text/plain' });
-        res.end('Internal Server Error');
-      } finally {
+    else if (req.url=== '/api/handledateinjurycase' && req.method === 'POST') {
+      let body = '';
     
-        //await sql.close();
-      }
-}
-  
+        req.on('data', (chunk) => {
+          body += chunk;
+        });
+    
+        req.on('end', async () => {
+          try {
+            await sql.connect(config);
+    
+            const { FromDate, ToDate } = JSON.parse(body);
+    
+    
+           const result = await sql.query(`
+              SELECT * FROM injury_case WHERE Date >= '${FromDate}' AND Date <= '${ToDate}';
+            `);
+    
+            const responseData = result.recordset;
+    
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            return res.end(JSON.stringify(responseData));
+          } catch (error) {
+            console.error('Error fetching data:', error.message);
+            res.writeHead(500, { 'Content-Type': 'text/plain' });
+            return res.end('Internal Server Error');
+          } finally {
+            //await sql.close();
+          }
+    
+      });
+    }
+
+    else if (req.url=== '/api/handledateinjuryreport' && req.method === 'POST') {
+      let body = '';
+    
+        req.on('data', (chunk) => {
+          body += chunk;
+        });
+    
+        req.on('end', async () => {
+          try {
+            await sql.connect(config);
+    
+            const { FromDate, ToDate } = JSON.parse(body);
+    
+    
+           const result = await sql.query(`
+           SELECT 
+           ride_info.RideName,
+           DATEPART(YEAR, injury_case.[Date]) AS [Year],
+           DATEPART(MONTH, injury_case.[Date]) AS [Month],
+           DATEPART(WEEK, injury_case.[Date]) AS [Week],
+           AVG(injury_case.AmountInjured) AS AvgInjured,
+           COUNT(issue_log.issueRideID) AS Breakdowns
+         FROM 
+           injury_case
+         LEFT JOIN issue_log ON injury_case.RideID = issue_log.IssueRideID
+         LEFT JOIN ride_info ON injury_case.RideID = ride_info.RideID
+       WHERE injury_case.[Date] >= '${FromDate}' AND  injury_case.[Date] <= '${ToDate}'
+         GROUP BY 
+           ride_info.RideName,
+           DATEPART(YEAR, injury_case.[Date]),
+           DATEPART(MONTH, injury_case.[Date]),
+           DATEPART(WEEK, injury_case.[Date])
+         ORDER BY 
+           [Year], [Month], [Week], ride_info.RideName;
+            `);
+    
+            const responseData = result.recordset;
+    
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            return res.end(JSON.stringify(responseData));
+          } catch (error) {
+            console.error('Error fetching data:', error.message);
+            res.writeHead(500, { 'Content-Type': 'text/plain' });
+            return res.end('Internal Server Error');
+          } finally {
+            //await sql.close();
+          }
+    
+      });
+    }
 
   else if (req.url === '/api/customer' && req.method === 'GET') {
     try {
