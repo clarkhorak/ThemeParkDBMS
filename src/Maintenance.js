@@ -7,6 +7,8 @@ function Maintenance() {
   const [zonevisible, setZoneVisibleSection] = useState('section01');
   const [addzonevisible, setAddZoneVisibleSection] = useState('section0');
   const [updatezonevisible, setUpdateZoneVisibleSection] = useState('section0');
+  const [issuelogvisible, setIssueLogVisibleSection] = useState('section1');
+  const [injurycasevisible, setInjuryCaseVisibleSection] = useState('section1');
 
   const showSection = (section) => {
     setVisibleSection(section);
@@ -20,6 +22,15 @@ function Maintenance() {
   const showUpdateZoneSection = (section) => {
     setUpdateZoneVisibleSection(section);
   }
+
+  const showIssueLogSection = (section) => {
+    setIssueLogVisibleSection(section);
+  }
+
+  const showInjuryCaseSection = (section) => {
+    setInjuryCaseVisibleSection(section);
+  }
+
   const[Zone1Data, setZone1Data] = useState([]);
   const[Zone2Data, setZone2Data] = useState([]);
   const[Zone3Data, setZone3Data] = useState([]);
@@ -65,9 +76,7 @@ function Maintenance() {
   const[Event2Data, setEvent2Data] = useState([]);
   const[Event3Data, setEvent3Data] = useState([]);
   const[Event4Data, setEvent4Data] = useState([]);
-  const[InjuryReportData, setInjuryReportData] = useState([]);
   const[BreakdownData, setBreakdownData] = useState([]);
-  const[InjuryCaseData, setInjuryCaseData] = useState([]);
   useEffect(() => {
     
     fetch('/api/all')
@@ -122,10 +131,9 @@ function Maintenance() {
         setInactiveEvent2Data(data.InactiveEvent2Data);
         setInactiveEvent3Data(data.InactiveEvent3Data);
         setInactiveEvent4Data(data.InactiveEvent4Data);
-        setInjuryReportData(data.InjuryReportData);
         setBreakdownData(data.BreakdownData);
         setStaffData(data.StaffData);
-        setInjuryCaseData(data.InjuryCaseData)
+        
 
       })
       .catch((error) => console.error('Error fetching data:', error));
@@ -481,26 +489,113 @@ function Maintenance() {
     }
   };
 
-const [IssueLog1Data, setIssueLog1Data] = useState([]);
+  const handleupdateinjury = async (event) => {
+    event.preventDefault();
+
+    const form = event.target;
+    const formData = new FormData(form);
+  
+    try {
+      const response = await fetch('/api/handleupdateinjury', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(Object.fromEntries(formData)),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+  
+      const result = await response.json();
+      alert("Updated Case Successfully!")
+      console.log(result); 
+      form.reset();
+
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert("Something went wrong! Please try again!")
+    }
+  };
+
+  const handleaddissuelog = async (event) => {
+    event.preventDefault();
+
+    const form = event.target;
+    const formData = new FormData(form);
+  
+    try {
+      const response = await fetch('/api/handleaddissuelog', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(Object.fromEntries(formData)),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+  
+      const result = await response.json();
+      alert("Add New Case Successfully!")
+      console.log(result); 
+      form.reset();
+
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert("Something went wrong! Please try again!")
+    }
+  };
+
+  const handleupdateissuelog = async (event) => {
+    event.preventDefault();
+
+    const form = event.target;
+    const formData = new FormData(form);
+  
+    try {
+      const response = await fetch('/api/handleupdateissuelog', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(Object.fromEntries(formData)),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+  
+      const result = await response.json();
+      alert("Updated Case Successfully!")
+      console.log(result); 
+      form.reset();
+
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert("Something went wrong! Please try again!")
+    }
+  };
+
+const [IssueLogData, setIssueLogData] = useState([]);
+const [InjuryCaseData, setInjuryCaseData] = useState([]);
+const [InjuryReportData, setInjuryReportData] = useState([]);
 
 const handledateissuelog = async (event) => {
+  event.preventDefault();
+
+  const form = event.target;
+  const formData = new FormData(form);
+
   try {
-  event.preventDefault(); // Prevent the default form submission behavior
-
-  
-    const dateStartInput = document.getElementById('DateStart');
-    const dateFixedInput = document.getElementById('DateFixed');
-
-    const DateStart = dateStartInput.value;
-    const DateFixed = dateFixedInput.value;
-
-    const apiUrl = `/api/handledateissuelog?DateStart=${DateStart}&DateFixed=${DateFixed}`;
-
-    const response = await fetch(apiUrl, {
-      method: 'GET',
+    const response = await fetch('/api/handledateissuelog', {
+      method: 'POST',
       headers: {
-        'Content-Type': 'application/json', // You can remove this line for GET requests
+        'Content-Type': 'application/json',
       },
+      body: JSON.stringify(Object.fromEntries(formData)),
     });
 
     if (!response.ok) {
@@ -508,23 +603,81 @@ const handledateissuelog = async (event) => {
     }
 
     const result = await response.json();
-    setIssueLog1Data(result);
+    setIssueLogData(result);
+    console.log(result); 
+    form.reset();
+    
   } catch (error) {
-    console.error('Error fetching data:', error);
+    console.error('Error submitting form:', error);
+    alert("Something went wrong! Please try again!")
+  }
+};
+const handledateinjurycase = async (event) => {
+  event.preventDefault();
+
+  const form = event.target;
+  const formData = new FormData(form);
+
+  try {
+    const response = await fetch('/api/handledateinjurycase', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(Object.fromEntries(formData)),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    setInjuryCaseData(result);
+    console.log(result); 
+    form.reset();
+    
+  } catch (error) {
+    console.error('Error submitting form:', error);
     alert("Something went wrong! Please try again!")
   }
 };
 
-/*useEffect(() => {
-  handledateissuelog();
-}, []);*/
+const handledateinjuryreport = async (event) => {
+  event.preventDefault();
+
+  const form = event.target;
+  const formData = new FormData(form);
+
+  try {
+    const response = await fetch('/api/handledateinjuryreport', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(Object.fromEntries(formData)),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    setInjuryReportData(result);
+    console.log(result); 
+    form.reset();
+    
+  } catch (error) {
+    console.error('Error submitting form:', error);
+    alert("Something went wrong! Please try again!")
+  }
+};
 
 
 const navigate = useNavigate();
 
 const signOut = () => {
   localStorage.removeItem("authenticatedM");
-  localStorage.removeItem("idM");
+  localStorage.removeItem("nameM");
   navigate("/"); //Navigate back to main page
 };
 
@@ -699,7 +852,8 @@ else{
             <div style={{ display: visible === 'section2' ? 'block' : 'none' }}>
               <div className="optiontextbox">
                 <h2>Issue Log</h2>
-                <form id="UpdateAccPas" onSubmit={handledateissuelog}  method="get" action="/submit">
+                <p>Please choose a day range for issue log.</p>
+                <form id="UpdateAccPas" onSubmit={handledateissuelog}  method="post" action="/submit">
                   <p>
                     <label htmlFor="DateStart">Date Start: </label>
                     <input
@@ -723,7 +877,9 @@ else{
                 </form>
                 <h3>Ride Breakdowns, Safety Inspection, Refurbishing</h3>
 
-                <p> All information of all issue logs have been reported</p>
+                <p> All information of all issue logs have been reported
+                  
+                </p>
                 <table>
                       <thead>
                       <tr>
@@ -738,12 +894,12 @@ else{
                       </tr>
                       </thead>
                       <tbody>
-                      {IssueLog1Data.map((issue_log) => (
+                      {IssueLogData.map((issue_log) => (
                         <tr key={issue_log.id}>
                         <td>{issue_log.LogIssueID}</td>
                         <td>{issue_log.IssueRideID}</td>
-                        <td>{issue_log.DateStart}</td>
-                        <td>{issue_log.DateFixed}</td>
+                        <td>{new Date(issue_log.DateStart).toLocaleDateString('en-US')}</td>
+                        <td>{new Date(issue_log.DateFixed).toLocaleDateString('en-US')}</td>
                         <td>{issue_log.CostToFix}</td>
                         <td>{issue_log.Reason}</td>
                         <td>{issue_log.FixedBy}</td>
@@ -752,8 +908,92 @@ else{
                       ))}
                       </tbody>
                 </table>
+                <br></br>
+                <h2>Add or Update Issue Log Information</h2>
+                <div className="issueloginfo">
+                  <button className="issuelogbutton" onClick={() => showIssueLogSection('section1')} >
+                   Add new issue log
+                  </button>
+                  <button className="issuelogbutton" onClick={() => showIssueLogSection('section2')} >
+                   Update issue log
+                  </button>
+            </div>
+
                 
-                <h3>Monthly Ride Breakdowns</h3>
+            <div style={{ display: issuelogvisible === 'section1' ? 'block' : 'none' }}>
+                <form onSubmit={handleaddissuelog} method="post" action="/submit">
+                          
+                          <p>
+                              <label><b><u>New Issue Log Information</u></b></label>
+                              
+                              <label for="IssueRideID">Ride ID:  </label>
+                              <input type="text" id="IssueRideID" name="IssueRideID" min="8" max="8" required/>
+                              
+                              <label for="DateStart">Date Start:  </label>
+                              <input type="date" id="DateStart" name="DateStart" required/>
+  
+                              <label for="DateFixed">Date Fixed:  </label>
+                              <input type="date" id="DateFixed" name="DateFixed" required/>
+
+                              <label for="CostToFix">Cost To Fix:  </label>
+                              <input type="int" id="CostToFix" name="CostToFix" required/> 
+
+                              <label for="Reason">Reason:  </label>
+                              <input type="text" id="Reason" name="Reason" min="6" max="500" required/>
+
+                              <label for="FixedBy">Fixed By:  </label>
+                              <input type="text" id="FixedBy" name="FixedBy" min="6" max="255" required/>
+
+                              <label for="OperatingStat">Operating Status:  </label>
+                              <input type="text" id="OperationStat" name="OperationStat" min="6" max="50" required/>
+                          </p>
+                          <p>
+                            <br></br>
+                              <button id="UpdateAccButton" type="submit">Submit</button>
+                          </p>
+
+                      </form>
+                      </div>
+                <div style={{ display: issuelogvisible === 'section2' ? 'block' : 'none' }}>
+                <form onSubmit={handleupdateissuelog} method="post" action="/submit">
+                          
+                          <p>
+                              <label><b><u>Update Issue Log Information</u></b></label>
+
+                              <label for="LogIssueID">Log Issue ID:  </label>
+                              <input type="text" id="LogIssueID" name="LogIssueID" min="8" max="8" required/>
+                              
+                              <label for="IssueRideID">Ride ID:  </label>
+                              <input type="text" id="IssueRideID" name="IssueRideID" min="8" max="8" required/>
+                              
+                              <label for="DateStart">Date Start:  </label>
+                              <input type="date" id="DateStart" name="DateStart" required/>
+  
+                              <label for="DateFixed">Date Fixed:  </label>
+                              <input type="date" id="DateFixed" name="DateFixed" required/>
+
+                              <label for="CostToFix">Cost To Fix:  </label>
+                              <input type="int" id="CostToFix" name="CostToFix" required/> 
+
+                              <label for="Reason">Reason:  </label>
+                              <input type="text" id="Reason" name="Reason" min="6" max="500" required/>
+
+                              <label for="FixedBy">Fixed By:  </label>
+                              <input type="text" id="FixedBy" name="FixedBy" min="6" max="255" required/>
+
+                              <label for="OperatingStat">Operating Status:  </label>
+                              <input type="text" id="OperationStat" name="OperationStat" min="6" max="50" required/>
+                          </p>
+                          <p>
+                            <br></br>
+                              <button id="UpdateAccButton" type="submit">Submit</button>
+                          </p>
+
+                      </form>
+                      </div>
+
+
+                <h2>Monthly Ride Breakdowns</h2>
                 <table class = "Services" id = "ServiceInfo">
                       <thead>
                        <tr>
@@ -780,23 +1020,23 @@ else{
                 
                 <div className="zonerideinfo">
                 {Zone1Data.map((theme_zone) => (
-                  <button className="zoneridebutton" onClick={() => showZoneSection('section01')} key={theme_zone.id}>
+                  <button className="zonesectionbutton" onClick={() => showZoneSection('section01')} key={theme_zone.id}>
                     {theme_zone.Zone_code} - {theme_zone.Name}
                   </button>
                 ))}
                 {Zone2Data.map((theme_zone) => (
-                  <button className="zoneridebutton" onClick={() => showZoneSection('section02')} key={theme_zone.id}>
+                  <button className="zonesectionbutton" onClick={() => showZoneSection('section02')} key={theme_zone.id}>
                     {theme_zone.Zone_code} - {theme_zone.Name}
                   </button>
                 ))}
                 <br></br>
                 {Zone3Data.map((theme_zone) => (
-                  <button className="zoneridebutton" onClick={() => showZoneSection('section03')} key={theme_zone.id}>
+                  <button className="zonesectionbutton" onClick={() => showZoneSection('section03')} key={theme_zone.id}>
                     {theme_zone.Zone_code} - {theme_zone.Name}
                   </button>
                 ))}
                 {Zone4Data.map((theme_zone) => (
-                  <button className="zoneridebutton" onClick={() => showZoneSection('section04')} key={theme_zone.id}>
+                  <button className="zonesectionbutton" onClick={() => showZoneSection('section04')} key={theme_zone.id}>
                     {theme_zone.Zone_code} - {theme_zone.Name}
                   </button>
                 ))}
@@ -826,7 +1066,7 @@ else{
                         <td>{special_events.Event_name}</td>
                         <td>{special_events.event_details}</td>
                         <td>{special_events.event_capacity}</td>
-                        <td>{special_events.event_date}</td>
+                        <td>{new Date(special_events.event_date).toLocaleDateString('en-US')}</td>
                         <td>{special_events.Status}</td>
                       </tr>
                       ))}
@@ -836,7 +1076,7 @@ else{
                         <td>{special_events.Event_name}</td>
                         <td>{special_events.event_details}</td>
                         <td>{special_events.event_capacity}</td>
-                        <td>{special_events.event_date}</td>
+                        <td>{new Date(special_events.event_date).toLocaleDateString('en-US')}</td>
                         <td>{special_events.Status}</td>
                       </tr>
                       ))}
@@ -1000,7 +1240,7 @@ else{
                         <td>{special_events.Event_name}</td>
                         <td>{special_events.event_details}</td>
                         <td>{special_events.event_capacity}</td>
-                        <td>{special_events.event_date}</td>
+                        <td>{new Date(special_events.event_date).toLocaleDateString('en-US')}</td>
                         <td>{special_events.Status}</td>
                       </tr>
                       ))}
@@ -1010,7 +1250,7 @@ else{
                         <td>{special_events.Event_name}</td>
                         <td>{special_events.event_details}</td>
                         <td>{special_events.event_capacity}</td>
-                        <td>{special_events.event_date}</td>
+                        <td>{new Date(special_events.event_date).toLocaleDateString('en-US')}</td>
                         <td>{special_events.Status}</td>
                       </tr>
                       ))}
@@ -1174,7 +1414,7 @@ else{
                         <td>{special_events.Event_name}</td>
                         <td>{special_events.event_details}</td>
                         <td>{special_events.event_capacity}</td>
-                        <td>{special_events.event_date}</td>
+                        <td>{new Date(special_events.event_date).toLocaleDateString('en-US')}</td>
                         <td>{special_events.Status}</td>
                       </tr>
                       ))}
@@ -1184,7 +1424,7 @@ else{
                         <td>{special_events.Event_name}</td>
                         <td>{special_events.event_details}</td>
                         <td>{special_events.event_capacity}</td>
-                        <td>{special_events.event_date}</td>
+                        <td>{new Date(special_events.event_date).toLocaleDateString('en-US')}</td>
                         <td>{special_events.Status}</td>
                       </tr>
                       ))}
@@ -1348,7 +1588,7 @@ else{
                         <td>{special_events.Event_name}</td>
                         <td>{special_events.event_details}</td>
                         <td>{special_events.event_capacity}</td>
-                        <td>{special_events.event_date}</td>
+                        <td>{new Date(special_events.event_date).toLocaleDateString('en-US')}</td>
                         <td>{special_events.Status}</td>
                       </tr>
                       ))}
@@ -1358,7 +1598,7 @@ else{
                         <td>{special_events.Event_name}</td>
                         <td>{special_events.event_details}</td>
                         <td>{special_events.event_capacity}</td>
-                        <td>{special_events.event_date}</td>
+                        <td>{new Date(special_events.event_date).toLocaleDateString('en-US')}</td>
                         <td>{special_events.Status}</td>
                       </tr>
                       ))}
@@ -1506,19 +1746,19 @@ else{
                   Add New Zone Information
                 </h2>
                 <div className="zonerideinfo">
-                  <button className="zoneridebutton" onClick={() => showAddZoneSection('section0')} >
+                  <button className="zonesectionbutton" onClick={() => showAddZoneSection('section0')} >
                    Event
                   </button>
-                  <button className="zoneridebutton" onClick={() => showAddZoneSection('section1')} >
+                  <button className="zonesectionbutton" onClick={() => showAddZoneSection('section1')} >
                    Ride
                   </button>
-                  <button className="zoneridebutton" onClick={() => showAddZoneSection('section2')}>
+                  <button className="zonesectionbutton" onClick={() => showAddZoneSection('section2')}>
                     Restaurant
                   </button>
-                  <button className="zoneridebutton" onClick={() => showAddZoneSection('section3')}>
+                  <button className="zonesectionbutton" onClick={() => showAddZoneSection('section3')}>
                     Merchandise shop
                   </button>
-                  <button className="zoneridebutton" onClick={() => showAddZoneSection('section4')}>
+                  <button className="zonesectionbutton" onClick={() => showAddZoneSection('section4')}>
                     Amenity & Service
                   </button>
             </div>
@@ -1780,19 +2020,19 @@ else{
                   Update Zone Information
                 </h2>
                 <div className="zonerideinfo">
-                  <button className="zoneridebutton" onClick={() => showUpdateZoneSection('section0')} >
+                  <button className="zonesectionbutton" onClick={() => showUpdateZoneSection('section0')} >
                    Event
                   </button>
-                  <button className="zoneridebutton" onClick={() => showUpdateZoneSection('section1')} >
+                  <button className="zonesectionbutton" onClick={() => showUpdateZoneSection('section1')} >
                    Ride
                   </button>
-                  <button className="zoneridebutton" onClick={() => showUpdateZoneSection('section2')}>
+                  <button className="zonesectionbutton" onClick={() => showUpdateZoneSection('section2')}>
                     Restaurant
                   </button>
-                  <button className="zoneridebutton" onClick={() => showUpdateZoneSection('section3')}>
+                  <button className="zonesectionbutton" onClick={() => showUpdateZoneSection('section3')}>
                     Merchandise shop
                   </button>
-                  <button className="zoneridebutton" onClick={() => showUpdateZoneSection('section4')}>
+                  <button className="zonesectionbutton" onClick={() => showUpdateZoneSection('section4')}>
                     Amenity & Service
                   </button>
             </div>
@@ -2064,7 +2304,8 @@ else{
               <div style={{ display: visible === 'section6' ? 'block' : 'none' }}>
               <div className="optiontextbox">
                 <h2>Injury Cases</h2>
-                <form id="UpdateAccPas" method="get" action="/submit">
+                <p>Please choose a day range for injury case.</p>
+                <form id="UpdateAccPas" onSubmit={handledateinjurycase} method="post" action="/submit">
                   <p>
                     <label for="FromDate">From: </label>
                     <input
@@ -2101,7 +2342,7 @@ else{
                         <tr key={injury_case.id}>
                         <td>{injury_case.InjuryCaseID}</td>
                         <td>{injury_case.RideID}</td>
-                        <td>{injury_case.Date}</td>
+                        <td>{new Date(injury_case.Date).toLocaleDateString('en-US')}</td>
                         <td>{injury_case.SeverityScale}</td>
                         <td>{injury_case.AmountInjured}</td>
                         </tr>
@@ -2109,12 +2350,13 @@ else{
                       </tbody>
                 </table>
                 <h2>Injury Cases Report</h2>
-                <p>This report shows records of how many injury cases does a ride have weekly!
+                <p>This report shows records of how many injury cases does a ride have weekly.
                   <br></br>
                   And
-                  <br></br> How many times does a ride do breakdown weekly!
+                  <br></br> How many times does a ride do breakdown weekly.
+                  <br></br>Please choose a day range for injury case report.
                 </p>
-                <form id="UpdateAccPas"  method="get" action="/submit">
+                <form id="UpdateAccPas" onSubmit={handledateinjuryreport} method="post" action="/submit">
                   <p>
                     <label for="FromDate">From: </label>
                     <input
@@ -2161,17 +2403,27 @@ else{
                       </tbody>
                 </table>
 
-                <h2>New Injury Case</h2>
+                <h2>Add New or Update Injury Case</h2>
+                <div className="injurycaseinfo">
+                  <button className="injurycasebutton" onClick={() => showInjuryCaseSection('section1')} >
+                   Add new issue log
+                  </button>
+                  <button className="injurycasebutton" onClick={() => showInjuryCaseSection('section2')} >
+                   Update issue log
+                  </button>
+            </div>
+                <div style={{ display: injurycasevisible === 'section1' ? 'block' : 'none' }}>
+                <h3><u>New Injury Case</u></h3>
                 <form id="UpdateAccPas" onSubmit={handlenewinjury}  method="post" action="/submit">
                   <p>
                     <label for="RideID">Ride ID: </label>
-                    <input type="text" id="RideID" name="RideID" min={8} max={8} required />
+                    <input type="text" id="RideID" name="RideID" min="8" max="8" required />
 
                     <label for="Date">Date: </label>
                     <input type="date" id="Date" name="Date" required />
 
                     <label for="SeverityScale">Severity Scale: </label>
-                    <input type="int" id="SeverityScale" name="SeverityScale" required />
+                    <input type="text" id="SeverityScale" name="SeverityScale" min="1" max="1" required />
 
                     <label for="AmountInjured">From: </label>
                     <input type="int" id="AmountInjured" name="AmountInjured" required />
@@ -2180,6 +2432,31 @@ else{
                     <button id="UpdateAccButton" type="submit">Submit</button>
                   </p>
                 </form>
+                 </div>
+                 <div style={{ display: injurycasevisible === 'section2' ? 'block' : 'none' }}>
+                <h3><u>Update Injury Case</u></h3>
+                <form id="UpdateAccPas" onSubmit={handleupdateinjury}  method="post" action="/submit">
+                  <p>
+                    <label for="InjuryCaseID">Injury Case ID: </label>
+                    <input type="text" id="InjuryCaseID" name="InjuryCaseID" min="8" max="8" required />
+
+                    <label for="RideID">Ride ID: </label>
+                    <input type="text" id="RideID" name="RideID" min="8" max="8" required />
+
+                    <label for="Date">Date: </label>
+                    <input type="date" id="Date" name="Date" required />
+
+                    <label for="SeverityScale">Severity Scale: </label>
+                    <input type="text" id="SeverityScale" name="SeverityScale" min="1" max="1" required />
+
+                    <label for="AmountInjured">From: </label>
+                    <input type="int" id="AmountInjured" name="AmountInjured" required />
+                  </p>
+                  <p>
+                    <button id="UpdateAccButton" type="submit">Submit</button>
+                  </p>
+                </form>
+                 </div>
                  </div>
               </div>
             </div>
