@@ -5,9 +5,11 @@ import { Navigate, useNavigate } from "react-router-dom";
 function Maintenance() {
   const [visible, setVisibleSection] = useState('section1');
   const [zonevisible, setZoneVisibleSection] = useState('section01');
-  const [addzonevisible, setAddZoneVisibleSection] = useState('section1');
+  const [addzonevisible, setAddZoneVisibleSection] = useState('section0');
   const [updatezonevisible, setUpdateZoneVisibleSection] = useState('section0');
-  
+  const [issuelogvisible, setIssueLogVisibleSection] = useState('section1');
+  const [injurycasevisible, setInjuryCaseVisibleSection] = useState('section1');
+
   const showSection = (section) => {
     setVisibleSection(section);
   }
@@ -21,6 +23,14 @@ function Maintenance() {
     setUpdateZoneVisibleSection(section);
   }
 
+  const showIssueLogSection = (section) => {
+    setIssueLogVisibleSection(section);
+  }
+
+  const showInjuryCaseSection = (section) => {
+    setInjuryCaseVisibleSection(section);
+  }
+
   const[Zone1Data, setZone1Data] = useState([]);
   const[Zone2Data, setZone2Data] = useState([]);
   const[Zone3Data, setZone3Data] = useState([]);
@@ -29,15 +39,19 @@ function Maintenance() {
   const[Ride1Data, setRide1Data] = useState([]);
   const[Stall1Data, setStall1Data] = useState([]);
   const[Shop1Data, setShop1Data] = useState([]);
+  const[Service1Data, setService1Data] = useState([]);
   const[Ride2Data, setRide2Data] = useState([]);
   const[Stall2Data, setStall2Data] = useState([]);
   const[Shop2Data, setShop2Data] = useState([]);
+  const[Service2Data, setService2Data] = useState([]);
   const[Ride3Data, setRide3Data] = useState([]);
   const[Stall3Data, setStall3Data] = useState([]);
   const[Shop3Data, setShop3Data] = useState([]);
+  const[Service3Data, setService3Data] = useState([]);
   const[Ride4Data, setRide4Data] = useState([]);
   const[Stall4Data, setStall4Data] = useState([]);
   const[Shop4Data, setShop4Data] = useState([]);
+  const[Service4Data, setService4Data] = useState([]);
   const[InactiveRide1Data, setInactiveRide1Data] = useState([]);
   const[InactiveRide2Data, setInactiveRide2Data] = useState([]);
   const[InactiveRide3Data, setInactiveRide3Data] = useState([]);
@@ -50,7 +64,19 @@ function Maintenance() {
   const[InactiveShop2Data, setInactiveShop2Data] = useState([]);
   const[InactiveShop3Data, setInactiveShop3Data] = useState([]);
   const[InactiveShop4Data, setInactiveShop4Data] = useState([]);
-  const[REPData, setREPData] = useState([]);
+  const[InactiveService1Data, setInactiveService1Data] = useState([]);
+  const[InactiveService2Data, setInactiveService2Data] = useState([]);
+  const[InactiveService3Data, setInactiveService3Data] = useState([]);
+  const[InactiveService4Data, setInactiveService4Data] = useState([]);
+  const[InactiveEvent1Data, setInactiveEvent1Data] = useState([]);
+  const[InactiveEvent2Data, setInactiveEvent2Data] = useState([]);
+  const[InactiveEvent3Data, setInactiveEvent3Data] = useState([]);
+  const[InactiveEvent4Data, setInactiveEvent4Data] = useState([]);
+  const[Event1Data, setEvent1Data] = useState([]);
+  const[Event2Data, setEvent2Data] = useState([]);
+  const[Event3Data, setEvent3Data] = useState([]);
+  const[Event4Data, setEvent4Data] = useState([]);
+  const[BreakdownData, setBreakdownData] = useState([]);
   useEffect(() => {
     
     fetch('/api/all')
@@ -89,8 +115,25 @@ function Maintenance() {
         setInactiveShop2Data(data.InactiveShop2Data);
         setInactiveShop3Data(data.InactiveShop3Data);
         setInactiveShop4Data(data.InactiveShop4Data);
+        setService1Data(data.Service1Data);
+        setService2Data(data.Service2Data);
+        setService3Data(data.Service3Data);
+        setService4Data(data.Service4Data);
+        setInactiveService1Data(data.InactiveService1Data);
+        setInactiveService2Data(data.InactiveService2Data);
+        setInactiveService3Data(data.InactiveService3Data);
+        setInactiveService4Data(data.InactiveService4Data);
+        setEvent1Data(data.Event1Data);
+        setEvent2Data(data.Event2Data);
+        setEvent3Data(data.Event3Data);
+        setEvent4Data(data.Event4Data);
+        setInactiveEvent1Data(data.InactiveEvent1Data);
+        setInactiveEvent2Data(data.InactiveEvent2Data);
+        setInactiveEvent3Data(data.InactiveEvent3Data);
+        setInactiveEvent4Data(data.InactiveEvent4Data);
+        setBreakdownData(data.BreakdownData);
         setStaffData(data.StaffData);
-        setREPData(data.REPData);
+        
 
       })
       .catch((error) => console.error('Error fetching data:', error));
@@ -125,15 +168,72 @@ function Maintenance() {
       alert("Something went wrong! Please try again!")
     }
   };
-  
-  const handleaddstallinfob = async (event) => {
+  const handleaddeventinfo = async (event) => {
     event.preventDefault();
 
     const form = event.target;
     const formData = new FormData(form);
   
     try {
-      const response = await fetch('/api/addstallinfob', {
+      const response = await fetch('/api/addeventinfo', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(Object.fromEntries(formData)),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+  
+      const result = await response.json();
+      alert("Add New Event Successfully!")
+      console.log(result); 
+      form.reset();
+
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert("Something went wrong! Please try again!")
+    }
+  };
+  const handleaddrideinfo = async (event) => {
+    event.preventDefault();
+
+    const form = event.target;
+    const formData = new FormData(form);
+  
+    try {
+      const response = await fetch('/api/addrideinfo', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(Object.fromEntries(formData)),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+  
+      const result = await response.json();
+      alert("Add New Ride Successfully!")
+      console.log(result); 
+      form.reset();
+
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert("Something went wrong! Please try again!")
+    }
+  };
+  const handleaddstallinfo = async (event) => {
+    event.preventDefault();
+
+    const form = event.target;
+    const formData = new FormData(form);
+  
+    try {
+      const response = await fetch('/api/addstallinfo', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -155,14 +255,14 @@ function Maintenance() {
       alert("Something went wrong! Please try again!")
     }
   };
-  const handleaddshopinfob = async (event) => {
+  const handleaddshopinfo = async (event) => {
     event.preventDefault();
 
     const form = event.target;
     const formData = new FormData(form);
   
     try {
-      const response = await fetch('/api/addshopinfob', {
+      const response = await fetch('/api/addshopinfo', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -184,15 +284,101 @@ function Maintenance() {
       alert("Something went wrong! Please try again!")
     }
   };
- 
-  const handleupdatestallinfob = async (event) => {
+  const handleaddserviceinfo = async (event) => {
     event.preventDefault();
 
     const form = event.target;
     const formData = new FormData(form);
   
     try {
-      const response = await fetch('/api/updatestallinfob', {
+      const response = await fetch('/api/addserviceinfo', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(Object.fromEntries(formData)),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+  
+      const result = await response.json();
+      alert("Add New Service Successfully!")
+      console.log(result); 
+      form.reset();
+
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert("Something went wrong! Please try again!")
+    }
+  };
+  const handleupdateeventinfo = async (event) => {
+    event.preventDefault();
+
+    const form = event.target;
+    const formData = new FormData(form);
+  
+    try {
+      const response = await fetch('/api/updateeventinfo', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(Object.fromEntries(formData)),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+  
+      const result = await response.json();
+      alert("Update Event Successfully!")
+      console.log(result); 
+      form.reset();
+
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert("Something went wrong! Please try again!")
+    }
+  };
+  const handleupdaterideinfo = async (event) => {
+    event.preventDefault();
+
+    const form = event.target;
+    const formData = new FormData(form);
+  
+    try {
+      const response = await fetch('/api/updaterideinfo', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(Object.fromEntries(formData)),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+  
+      const result = await response.json();
+      alert("Update Event Successfully!")
+      console.log(result); 
+      form.reset();
+
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert("Something went wrong! Please try again!")
+    }
+  };
+  const handleupdatestallinfo = async (event) => {
+    event.preventDefault();
+
+    const form = event.target;
+    const formData = new FormData(form);
+  
+    try {
+      const response = await fetch('/api/updatestallinfo', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -214,14 +400,14 @@ function Maintenance() {
       alert("Something went wrong! Please try again!")
     }
   };
-  const handleupdateshopinfob = async (event) => {
+  const handleupdateshopinfo = async (event) => {
     event.preventDefault();
 
     const form = event.target;
     const formData = new FormData(form);
   
     try {
-      const response = await fetch('/api/updateshopinfob', {
+      const response = await fetch('/api/updateshopinfo', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -243,16 +429,168 @@ function Maintenance() {
       alert("Something went wrong! Please try again!")
     }
   };
-const [CusReportData, setCusReportData] = useState([]);
+  const handleupdateserviceinfo = async (event) => {
+    event.preventDefault();
 
-const handledatecusreport = async (event) => {
+    const form = event.target;
+    const formData = new FormData(form);
+  
+    try {
+      const response = await fetch('/api/updateserviceinfo', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(Object.fromEntries(formData)),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+  
+      const result = await response.json();
+      alert("Update Service Successfully!")
+      console.log(result); 
+      form.reset();
+
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert("Something went wrong! Please try again!")
+    }
+  };
+
+  const handlenewinjury = async (event) => {
+    event.preventDefault();
+
+    const form = event.target;
+    const formData = new FormData(form);
+  
+    try {
+      const response = await fetch('/api/handlenewinjury', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(Object.fromEntries(formData)),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+  
+      const result = await response.json();
+      alert("Add New Case Successfully!")
+      console.log(result); 
+      form.reset();
+
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert("Something went wrong! Please try again!")
+    }
+  };
+
+  const handleupdateinjury = async (event) => {
+    event.preventDefault();
+
+    const form = event.target;
+    const formData = new FormData(form);
+  
+    try {
+      const response = await fetch('/api/handleupdateinjury', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(Object.fromEntries(formData)),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+  
+      const result = await response.json();
+      alert("Updated Case Successfully!")
+      console.log(result); 
+      form.reset();
+
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert("Something went wrong! Please try again!")
+    }
+  };
+
+  const handleaddissuelog = async (event) => {
+    event.preventDefault();
+
+    const form = event.target;
+    const formData = new FormData(form);
+  
+    try {
+      const response = await fetch('/api/handleaddissuelog', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(Object.fromEntries(formData)),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+  
+      const result = await response.json();
+      alert("Add New Case Successfully!")
+      console.log(result); 
+      form.reset();
+
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert("Something went wrong! Please try again!")
+    }
+  };
+
+  const handleupdateissuelog = async (event) => {
+    event.preventDefault();
+
+    const form = event.target;
+    const formData = new FormData(form);
+  
+    try {
+      const response = await fetch('/api/handleupdateissuelog', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(Object.fromEntries(formData)),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+  
+      const result = await response.json();
+      alert("Updated Case Successfully!")
+      console.log(result); 
+      form.reset();
+
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert("Something went wrong! Please try again!")
+    }
+  };
+
+const [IssueLogData, setIssueLogData] = useState([]);
+const [InjuryCaseData, setInjuryCaseData] = useState([]);
+const [InjuryReportData, setInjuryReportData] = useState([]);
+
+const handledateissuelog = async (event) => {
   event.preventDefault();
 
   const form = event.target;
   const formData = new FormData(form);
 
   try {
-    const response = await fetch('/api/handledatecusreport', {
+    const response = await fetch('/api/handledateissuelog', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -265,7 +603,36 @@ const handledatecusreport = async (event) => {
     }
 
     const result = await response.json();
-    setCusReportData(result);
+    setIssueLogData(result);
+    console.log(result); 
+    form.reset();
+    
+  } catch (error) {
+    console.error('Error submitting form:', error);
+    alert("Something went wrong! Please try again!")
+  }
+};
+const handledateinjurycase = async (event) => {
+  event.preventDefault();
+
+  const form = event.target;
+  const formData = new FormData(form);
+
+  try {
+    const response = await fetch('/api/handledateinjurycase', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(Object.fromEntries(formData)),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    setInjuryCaseData(result);
     console.log(result); 
     form.reset();
     
@@ -275,17 +642,48 @@ const handledatecusreport = async (event) => {
   }
 };
 
+const handledateinjuryreport = async (event) => {
+  event.preventDefault();
+
+  const form = event.target;
+  const formData = new FormData(form);
+
+  try {
+    const response = await fetch('/api/handledateinjuryreport', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(Object.fromEntries(formData)),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    setInjuryReportData(result);
+    console.log(result); 
+    form.reset();
+    
+  } catch (error) {
+    console.error('Error submitting form:', error);
+    alert("Something went wrong! Please try again!")
+  }
+};
+
+
 const navigate = useNavigate();
 
 const signOut = () => {
-  localStorage.removeItem("authenticatedB");
-  localStorage.removeItem("idB");
+  localStorage.removeItem("authenticatedM");
+  localStorage.removeItem("idM");
   navigate("/");
 };
 
 function GetEmpObj() {
   for (const obj of StaffData) {
-    if (obj.first_name === localStorage.getItem("idB")) {
+    if (obj.employee_id === localStorage.getItem("idM")) {
       return (
           <div key={obj.employee_id}>
             <h3>
@@ -323,9 +721,32 @@ function GetEmpObj() {
   }
 }
 
+function GetEmpID() {
+  for (const obj of StaffData) {
+    if (obj.employee_id == localStorage.getItem("idM")) {
+      return (
+        <h3>Employee ID: {obj.employee_id}</h3>
+      );
+    }
+  }
+}
+
+function GetEmpWage() {
+  for (const obj of StaffData) {
+    if (obj.employee_id == localStorage.getItem("idM")) {
+      return (
+        <tr key={obj.employee_id}>
+        <td>{obj.hourly_pay}</td>
+        <td>{obj.salary}</td>
+        </tr>
+      );
+    }
+  }
+}
+
 function ReturnEmployeeName() {
   for (const obj of StaffData) {
-    if(obj.employee_id == localStorage.getItem("idB")) {
+    if(obj.employee_id == localStorage.getItem("idM")) {
       return (
         <div>Welcome back, {obj.first_name}!</div>
       );
@@ -334,7 +755,7 @@ function ReturnEmployeeName() {
 }
 
 
-if (localStorage.getItem("authenticatedB") === false || localStorage.getItem("authenticatedB") == null) {
+if (localStorage.getItem("authenticatedM") === false || localStorage.getItem("authenticatedM") == null) {
   console.log("Unsuccessful login");
   return <Navigate replace to={navigate(-1)} />;
 }
@@ -357,7 +778,7 @@ else{
         </div>
         ))}
         <div className="visitortype">
-          Business Analyst
+          Maintenance
         </div>
 
         <div className="group">
@@ -371,17 +792,21 @@ else{
                 Account Information
               </button>
               <button className="HazardRep"onClick={() => showSection('section2')}>
-                Business Report
+                Issue Log / Ride Breakdowns
               </button>
               <button className="ZoneInfoButton"onClick={() => showSection('section3')}>
                 Zone Information
               </button>
-              <button className="AddZoneInfo"onClick={() => showSection('section4')}>
+              <button className="AddRide"onClick={() => showSection('section4')}>
                 Add New Zone Information
               </button>
-              <button className="UpdateZoneInfo"onClick={() => showSection('section5')}>
+              <button className="UpdateRide"onClick={() => showSection('section5')}>
                 Update Zone Information
               </button>
+              <button className="InjuryReport"onClick={() => showSection('section6')}>
+                Injury Case
+              </button>
+            
             </div>
             <div className="Menutxt">Menu</div>
 
@@ -426,23 +851,23 @@ else{
 
             <div style={{ display: visible === 'section2' ? 'block' : 'none' }}>
               <div className="optiontextbox">
-                <h2>Amount of Customers Report</h2>
-                <p>Please choose a day range for report.</p>
-                <form id="UpdateAccPas" onSubmit={handledatecusreport}  method="post" action="/submit">
+                <h2>Issue Log</h2>
+                <p>Please choose a day range for issue log.</p>
+                <form id="UpdateAccPas" onSubmit={handledateissuelog}  method="post" action="/submit">
                   <p>
-                    <label htmlFor="startDate">From: </label>
+                    <label htmlFor="DateStart">Date Start: </label>
                     <input
                       type="date"
-                      id="startDate"
-                      name="startDate"
+                      id="DateStart"
+                      name="DateStart"
                       required
                     />
 
-                    <label htmlFor="endDate">To: </label>
+                    <label htmlFor="DateFixed">Date Fixed: </label>
                     <input
                       type="date"
-                      id="endDate"
-                      name="endDate"
+                      id="DateFixed"
+                      name="DateFixed"
                       required
                     />
                   </p>
@@ -450,96 +875,143 @@ else{
                     <button id="UpdateAccButton" type="submit"> Submit</button>
                   </p>
                 </form>
-                <p> All information of the report have been reported weekly, and monthly
+                <h3>Ride Breakdowns, Safety Inspection, Refurbishing</h3>
+
+                <p> All information of all issue logs have been reported
                   
                 </p>
                 <table>
                       <thead>
                       <tr>
-                        <th>Frequency</th>
-                        <th>Year</th>
-                        <th>From</th>
-                        <th>To</th>
-                        <th>New Amount of Customers</th>
-                        <th>New Amount of Customer</th>
-                        <th>Total Amount of Customer</th>
-                        
+                        <th>Log ID </th>
+                        <th>Ride ID</th>
+                        <th>Date Start</th>
+                        <th>Date Fixed</th>
+                        <th>Cost</th>
+                        <th>Reason</th>
+                        <th>Fixed by</th>
+                        <th>Operation Status</th>
                       </tr>
                       </thead>
                       <tbody>
-                      {CusReportData.map((table) => (
-                        <tr key={table.id}>
-                        <td>{table.Frequency}</td>
-                        <td>{table.Year}</td>
-                        <td>{new Date(table.startDate).toLocaleDateString('en-US')}</td>
-                        <td>{new Date(table.endDate).toLocaleDateString('en-US')}</td>
-                        <td>{table.NewAmount}</td>
-                        <td>{table.OldAmount}</td>
-                        <td>{table.AllCustomersAmount}</td>
+                      {IssueLogData.map((issue_log) => (
+                        <tr key={issue_log.id}>
+                        <td>{issue_log.LogIssueID}</td>
+                        <td>{issue_log.IssueRideID}</td>
+                        <td>{new Date(issue_log.DateStart).toLocaleDateString('en-US')}</td>
+                        <td>{new Date(issue_log.DateFixed).toLocaleDateString('en-US')}</td>
+                        <td>{issue_log.CostToFix}</td>
+                        <td>{issue_log.Reason}</td>
+                        <td>{issue_log.FixedBy}</td>
+                        <td>{issue_log.OperatingStat}</td>
                         </tr>
                       ))}
                       </tbody>
                 </table>
-                <h2>Restaurants and Merchandise Shops Revenue, Expense, Profit</h2>
-                <h3>Restaurant Report</h3>
-                <table>
-                      <thead>
-                      <tr>
-                        <th>Total Restaurant Revenue</th>
-                        <th>Total Restaurant Expense</th>
-                        <th>Total Restaurant Profit</th>
-                        
-                      </tr>
-                      </thead>
-                      <tbody>
-                      {REPData.map((rep) => (
-                        <tr key={rep.id}>
-                        <td>{rep.Total_Food_Stall_Revenue}</td>
-                        <td>{rep.Total_Food_Stall_Expenses}</td>
-                        <td>{rep.Total_Food_Stall_Profit}</td>
-                        </tr>
-                      ))}
-                      </tbody>
-                </table>
+                <br></br>
+                <h2>Add or Update Issue Log Information</h2>
+                <div className="issueloginfo">
+                  <button className="issuelogbutton" onClick={() => showIssueLogSection('section1')} >
+                   Add new issue log
+                  </button>
+                  <button className="issuelogbutton" onClick={() => showIssueLogSection('section2')} >
+                   Update issue log
+                  </button>
+            </div>
 
-                <h3>Merchandise Shop Report</h3>
-                <table>
-                      <thead>
-                      <tr>
-                        <th>Total Merchandise Shop Revenue</th>
-                        <th>Total Merchandise Shop Expense</th>
-                        <th>Total Merchandise Shop Profit</th>
-                        
-                      </tr>
-                      </thead>
-                      <tbody>
-                      {REPData.map((rep) => (
-                        <tr key={rep.id}>
-                        <td>{rep.Total_Merchandise_Revenue}</td>
-                        <td>{rep.Total_Merchandise_Expenses}</td>
-                        <td>{rep.Total_Merchandise_Profit}</td>
-                        </tr>
-                      ))}
-                      </tbody>
-                </table>
+                
+            <div style={{ display: issuelogvisible === 'section1' ? 'block' : 'none' }}>
+                <form onSubmit={handleaddissuelog} method="post" action="/submit">
+                          
+                          <p>
+                              <label><b><u>New Issue Log Information</u></b></label>
+                              
+                              <label for="IssueRideID">Ride ID:  </label>
+                              <input type="text" id="IssueRideID" name="IssueRideID" min="8" max="8" required/>
+                              
+                              <label for="DateStart">Date Start:  </label>
+                              <input type="date" id="DateStart" name="DateStart" required/>
+  
+                              <label for="DateFixed">Date Fixed:  </label>
+                              <input type="date" id="DateFixed" name="DateFixed" required/>
 
-                <h3>Grand Total Profit</h3>
-                <table>
+                              <label for="CostToFix">Cost To Fix:  </label>
+                              <input type="int" id="CostToFix" name="CostToFix" required/> 
+
+                              <label for="Reason">Reason:  </label>
+                              <input type="text" id="Reason" name="Reason" min="6" max="500" required/>
+
+                              <label for="FixedBy">Fixed By:  </label>
+                              <input type="text" id="FixedBy" name="FixedBy" min="6" max="255" required/>
+
+                              <label for="OperatingStat">Operating Status:  </label>
+                              <input type="text" id="OperationStat" name="OperationStat" min="6" max="50" required/>
+                          </p>
+                          <p>
+                            <br></br>
+                              <button id="UpdateAccButton" type="submit">Submit</button>
+                          </p>
+
+                      </form>
+                      </div>
+                <div style={{ display: issuelogvisible === 'section2' ? 'block' : 'none' }}>
+                <form onSubmit={handleupdateissuelog} method="post" action="/submit">
+                          
+                          <p>
+                              <label><b><u>Update Issue Log Information</u></b></label>
+
+                              <label for="LogIssueID">Log Issue ID:  </label>
+                              <input type="text" id="LogIssueID" name="LogIssueID" min="8" max="8" required/>
+                              
+                              <label for="IssueRideID">Ride ID:  </label>
+                              <input type="text" id="IssueRideID" name="IssueRideID" min="8" max="8" required/>
+                              
+                              <label for="DateStart">Date Start:  </label>
+                              <input type="date" id="DateStart" name="DateStart" required/>
+  
+                              <label for="DateFixed">Date Fixed:  </label>
+                              <input type="date" id="DateFixed" name="DateFixed" required/>
+
+                              <label for="CostToFix">Cost To Fix:  </label>
+                              <input type="int" id="CostToFix" name="CostToFix" required/> 
+
+                              <label for="Reason">Reason:  </label>
+                              <input type="text" id="Reason" name="Reason" min="6" max="500" required/>
+
+                              <label for="FixedBy">Fixed By:  </label>
+                              <input type="text" id="FixedBy" name="FixedBy" min="6" max="255" required/>
+
+                              <label for="OperatingStat">Operating Status:  </label>
+                              <input type="text" id="OperationStat" name="OperationStat" min="6" max="50" required/>
+                          </p>
+                          <p>
+                            <br></br>
+                              <button id="UpdateAccButton" type="submit">Submit</button>
+                          </p>
+
+                      </form>
+                      </div>
+
+
+                <h2>Monthly Ride Breakdowns</h2>
+                <table class = "Services" id = "ServiceInfo">
                       <thead>
-                      <tr>
-                        <th>Amount</th>
-                       
-                        
+                       <tr>
+                       <th>Month</th>
+                       <th>Year</th>
+                       <th>Total issues</th>
                       </tr>
                       </thead>
                       <tbody>
-                      {REPData.map((rep) => (
-                        <tr key={rep.id}>
-                        <td>{rep.Grand_Total_Profit}</td>
-                        </tr>
+                      {BreakdownData.map((table) => (
+                      <tr key={table.id}>
+                        <td>{table.MONTH}</td>
+                        <td>{table.YEAR}</td>
+                        <td>{table.BROKE_DOWN_RIDES}</td>
+                      </tr>
                       ))}
                       </tbody>
-                </table>
+                 </table>
                  </div>
               </div>
               <div style={{ display: visible === 'section3' ? 'block' : 'none' }}>
@@ -575,6 +1047,41 @@ else{
                       <u key={theme_zone.id}>{theme_zone.Zone_code} - {theme_zone.Name}</u>
                     ))}
                     </h2>
+                    <h2>Events</h2>
+                    <table>
+                      <thead>
+                      <tr>
+                        <th>Event ID</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Capacity</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                      {Event1Data.map((special_events) => (
+                      <tr key={special_events.id}>
+                        <td>{special_events.Event_ID}</td>
+                        <td>{special_events.Event_name}</td>
+                        <td>{special_events.event_details}</td>
+                        <td>{special_events.event_capacity}</td>
+                        <td>{new Date(special_events.event_date).toLocaleDateString('en-US')}</td>
+                        <td>{special_events.Status}</td>
+                      </tr>
+                      ))}
+                      {InactiveEvent1Data.map((special_events) => (
+                      <tr key={special_events.id}>
+                        <td>{special_events.Event_ID}</td>
+                        <td>{special_events.Event_name}</td>
+                        <td>{special_events.event_details}</td>
+                        <td>{special_events.event_capacity}</td>
+                        <td>{new Date(special_events.event_date).toLocaleDateString('en-US')}</td>
+                        <td>{special_events.Status}</td>
+                      </tr>
+                      ))}
+                      </tbody>
+                  </table>
                     <h2>Rides</h2>
                   <table>
                       <thead>
@@ -625,9 +1132,6 @@ else{
                         <th>Name</th>
                         <th>Type</th>
                         <th>Status</th>
-                        <th>Revenue</th>
-                        <th>Expense</th>
-                        <th>Profit</th>
                       </tr>
                       </thead>
                       <tbody>
@@ -637,9 +1141,6 @@ else{
                         <td>{food_stalls.Name}</td>
                         <td>{food_stalls.Type}</td>
                         <td>{food_stalls.Status}</td>
-                        <td>{food_stalls.Revenue}</td>
-                        <td>{food_stalls.Expense}</td>
-                        <td>{food_stalls.Profit}</td>
                       </tr>
                       ))}
                       {InactiveStall1Data.map((food_stalls) => (
@@ -648,9 +1149,6 @@ else{
                         <td>{food_stalls.Name}</td>
                         <td>{food_stalls.Type}</td>
                         <td>{food_stalls.Status}</td>
-                        <td>{food_stalls.Revenue}</td>
-                        <td>{food_stalls.Expense}</td>
-                        <td>{food_stalls.Profit}</td>
                       </tr>
                       ))}
                       </tbody>
@@ -663,9 +1161,6 @@ else{
                         <th>Name</th>
                         <th>Type</th>
                         <th>Status</th>
-                        <th>Revenue</th>
-                        <th>Expense</th>
-                        <th>Profit</th>
                       </tr>
                       </thead>
                       <tbody>
@@ -675,9 +1170,6 @@ else{
                         <td>{Merchandise.Name}</td>
                         <td>{Merchandise.ProductType}</td>
                         <td>{Merchandise.Status}</td>
-                        <td>{Merchandise.Revenue}</td>
-                        <td>{Merchandise.Expenses}</td>
-                        <td>{Merchandise.Profit}</td>
                       </tr>
                       ))}
                       {InactiveShop1Data.map((Merchandise) => (
@@ -686,14 +1178,42 @@ else{
                         <td>{Merchandise.Name}</td>
                         <td>{Merchandise.ProductType}</td>
                         <td>{Merchandise.Status}</td>
-                        <td>{Merchandise.Revenue}</td>
-                        <td>{Merchandise.Expenses}</td>
-                        <td>{Merchandise.Profit}</td>
                       </tr>
                       ))}
                       </tbody>
                   </table>
-                  
+                  <h2>Amenities & Service</h2>
+                  <table>
+                      <thead>
+                      <tr>
+                        <th>Service ID</th>
+                        <th>Service</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Status</th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                      {Service1Data.map((amenities_and_service) => (
+                      <tr key={amenities_and_service.id}>
+                        <td>{amenities_and_service.Service_ID}</td>
+                        <td>{amenities_and_service.Service}</td>
+                        <td>{amenities_and_service.Name}</td>
+                        <td>{amenities_and_service.Description}</td>
+                        <td>{amenities_and_service.Status}</td>
+                      </tr>
+                      ))}
+                      {InactiveService1Data.map((amenities_and_service) => (
+                      <tr key={amenities_and_service.id}>
+                        <td>{amenities_and_service.Service_ID}</td>
+                        <td>{amenities_and_service.Service}</td>
+                        <td>{amenities_and_service.Name}</td>
+                        <td>{amenities_and_service.Description}</td>
+                        <td>{amenities_and_service.Status}</td>
+                      </tr>
+                      ))}
+                      </tbody>
+                  </table>
                   </div>
                   <div style={{ display: zonevisible === 'section02' ? 'block' : 'none' }}>
                   <h2>
@@ -701,6 +1221,41 @@ else{
                       <u key={theme_zone.id}>{theme_zone.Zone_code} - {theme_zone.Name}</u>
                     ))}
                     </h2>
+                  <h2>Events</h2>
+                    <table>
+                      <thead>
+                      <tr>
+                        <th>Event ID</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Capacity</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                      {Event2Data.map((special_events) => (
+                      <tr key={special_events.id}>
+                        <td>{special_events.Event_ID}</td>
+                        <td>{special_events.Event_name}</td>
+                        <td>{special_events.event_details}</td>
+                        <td>{special_events.event_capacity}</td>
+                        <td>{new Date(special_events.event_date).toLocaleDateString('en-US')}</td>
+                        <td>{special_events.Status}</td>
+                      </tr>
+                      ))}
+                      {InactiveEvent2Data.map((special_events) => (
+                      <tr key={special_events.id}>
+                        <td>{special_events.Event_ID}</td>
+                        <td>{special_events.Event_name}</td>
+                        <td>{special_events.event_details}</td>
+                        <td>{special_events.event_capacity}</td>
+                        <td>{new Date(special_events.event_date).toLocaleDateString('en-US')}</td>
+                        <td>{special_events.Status}</td>
+                      </tr>
+                      ))}
+                      </tbody>
+                  </table>
                     <h2>Rides</h2>
                   <table>
                       <thead>
@@ -751,9 +1306,6 @@ else{
                         <th>Name</th>
                         <th>Type</th>
                         <th>Status</th>
-                        <th>Revenue</th>
-                        <th>Expense</th>
-                        <th>Profit</th>
                       </tr>
                       </thead>
                       <tbody>
@@ -763,9 +1315,6 @@ else{
                         <td>{food_stalls.Name}</td>
                         <td>{food_stalls.Type}</td>
                         <td>{food_stalls.Status}</td>
-                        <td>{food_stalls.Revenue}</td>
-                        <td>{food_stalls.Expense}</td>
-                        <td>{food_stalls.Profit}</td>
                       </tr>
                       ))}
                       {InactiveStall2Data.map((food_stalls) => (
@@ -774,9 +1323,6 @@ else{
                         <td>{food_stalls.Name}</td>
                         <td>{food_stalls.Type}</td>
                         <td>{food_stalls.Status}</td>
-                        <td>{food_stalls.Revenue}</td>
-                        <td>{food_stalls.Expense}</td>
-                        <td>{food_stalls.Profit}</td>
                       </tr>
                       ))}
                       </tbody>
@@ -789,9 +1335,6 @@ else{
                         <th>Name</th>
                         <th>Type</th>
                         <th>Status</th>
-                        <th>Revenue</th>
-                        <th>Expense</th>
-                        <th>Profit</th>
                       </tr>
                       </thead>
                       <tbody>
@@ -801,9 +1344,6 @@ else{
                         <td>{Merchandise.Name}</td>
                         <td>{Merchandise.ProductType}</td>
                         <td>{Merchandise.Status}</td>
-                        <td>{Merchandise.Revenue}</td>
-                        <td>{Merchandise.Expenses}</td>
-                        <td>{Merchandise.Profit}</td>
                       </tr>
                       ))}
                       {InactiveShop2Data.map((Merchandise) => (
@@ -812,14 +1352,42 @@ else{
                         <td>{Merchandise.Name}</td>
                         <td>{Merchandise.ProductType}</td>
                         <td>{Merchandise.Status}</td>
-                        <td>{Merchandise.Revenue}</td>
-                        <td>{Merchandise.Expenses}</td>
-                        <td>{Merchandise.Profit}</td>
                       </tr>
                       ))}
                       </tbody>
                   </table>
-                  
+                  <h2>Amenities & Service</h2>
+                  <table>
+                      <thead>
+                      <tr>
+                        <th>Service ID</th>
+                        <th>Service</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Status</th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                      {Service2Data.map((amenities_and_service) => (
+                      <tr key={amenities_and_service.id}>
+                        <td>{amenities_and_service.Service_ID}</td>
+                        <td>{amenities_and_service.Service}</td>
+                        <td>{amenities_and_service.Name}</td>
+                        <td>{amenities_and_service.Description}</td>
+                        <td>{amenities_and_service.Status}</td>
+                      </tr>
+                      ))}
+                      {InactiveService2Data.map((amenities_and_service) => (
+                      <tr key={amenities_and_service.id}>
+                        <td>{amenities_and_service.Service_ID}</td>
+                        <td>{amenities_and_service.Service}</td>
+                        <td>{amenities_and_service.Name}</td>
+                        <td>{amenities_and_service.Description}</td>
+                        <td>{amenities_and_service.Status}</td>
+                      </tr>
+                      ))}
+                      </tbody>
+                  </table>
                   </div>
                   <div style={{ display: zonevisible === 'section03' ? 'block' : 'none' }}>
                     <h2>
@@ -827,6 +1395,41 @@ else{
                       <u key={theme_zone.id}>{theme_zone.Zone_code} - {theme_zone.Name}</u>
                     ))}
                     </h2>
+                  <h2>Events</h2>
+                    <table>
+                      <thead>
+                      <tr>
+                        <th>Event ID</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Capacity</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                      {Event3Data.map((special_events) => (
+                      <tr key={special_events.id}>
+                        <td>{special_events.Event_ID}</td>
+                        <td>{special_events.Event_name}</td>
+                        <td>{special_events.event_details}</td>
+                        <td>{special_events.event_capacity}</td>
+                        <td>{new Date(special_events.event_date).toLocaleDateString('en-US')}</td>
+                        <td>{special_events.Status}</td>
+                      </tr>
+                      ))}
+                      {InactiveEvent3Data.map((special_events) => (
+                      <tr key={special_events.id}>
+                        <td>{special_events.Event_ID}</td>
+                        <td>{special_events.Event_name}</td>
+                        <td>{special_events.event_details}</td>
+                        <td>{special_events.event_capacity}</td>
+                        <td>{new Date(special_events.event_date).toLocaleDateString('en-US')}</td>
+                        <td>{special_events.Status}</td>
+                      </tr>
+                      ))}
+                      </tbody>
+                  </table>
                     <h2>Rides</h2>
                   <table>
                       <thead>
@@ -877,9 +1480,6 @@ else{
                         <th>Name</th>
                         <th>Type</th>
                         <th>Status</th>
-                        <th>Revenue</th>
-                        <th>Expense</th>
-                        <th>Profit</th>
                       </tr>
                       </thead>
                       <tbody>
@@ -889,9 +1489,6 @@ else{
                         <td>{food_stalls.Name}</td>
                         <td>{food_stalls.Type}</td>
                         <td>{food_stalls.Status}</td>
-                        <td>{food_stalls.Revenue}</td>
-                        <td>{food_stalls.Expense}</td>
-                        <td>{food_stalls.Profit}</td>
                       </tr>
                       ))}
                       {InactiveStall3Data.map((food_stalls) => (
@@ -900,9 +1497,6 @@ else{
                         <td>{food_stalls.Name}</td>
                         <td>{food_stalls.Type}</td>
                         <td>{food_stalls.Status}</td>
-                        <td>{food_stalls.Revenue}</td>
-                        <td>{food_stalls.Expense}</td>
-                        <td>{food_stalls.Profit}</td>
                       </tr>
                       ))}
                       </tbody>
@@ -915,9 +1509,6 @@ else{
                         <th>Name</th>
                         <th>Type</th>
                         <th>Status</th>
-                        <th>Revenue</th>
-                        <th>Expense</th>
-                        <th>Profit</th>
                       </tr>
                       </thead>
                       <tbody>
@@ -927,9 +1518,6 @@ else{
                         <td>{Merchandise.Name}</td>
                         <td>{Merchandise.ProductType}</td>
                         <td>{Merchandise.Status}</td>
-                        <td>{Merchandise.Revenue}</td>
-                        <td>{Merchandise.Expenses}</td>
-                        <td>{Merchandise.Profit}</td>
                       </tr>
                       ))}
                       {InactiveShop3Data.map((Merchandise) => (
@@ -938,14 +1526,42 @@ else{
                         <td>{Merchandise.Name}</td>
                         <td>{Merchandise.ProductType}</td>
                         <td>{Merchandise.Status}</td>
-                        <td>{Merchandise.Revenue}</td>
-                        <td>{Merchandise.Expenses}</td>
-                        <td>{Merchandise.Profit}</td>
                       </tr>
                       ))}
                       </tbody>
                   </table>
-                  
+                  <h2>Amenities & Service</h2>
+                  <table>
+                      <thead>
+                      <tr>
+                        <th>Service ID</th>
+                        <th>Service</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Status</th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                      {Service3Data.map((amenities_and_service) => (
+                      <tr key={amenities_and_service.id}>
+                        <td>{amenities_and_service.Service_ID}</td>
+                        <td>{amenities_and_service.Service}</td>
+                        <td>{amenities_and_service.Name}</td>
+                        <td>{amenities_and_service.Description}</td>
+                        <td>{amenities_and_service.Status}</td>
+                      </tr>
+                      ))}
+                      {InactiveService3Data.map((amenities_and_service) => (
+                      <tr key={amenities_and_service.id}>
+                        <td>{amenities_and_service.Service_ID}</td>
+                        <td>{amenities_and_service.Service}</td>
+                        <td>{amenities_and_service.Name}</td>
+                        <td>{amenities_and_service.Description}</td>
+                        <td>{amenities_and_service.Status}</td>
+                      </tr>
+                      ))}
+                      </tbody>
+                  </table>
                   </div>
                   <div style={{ display: zonevisible === 'section04' ? 'block' : 'none' }}>
                     <h2>
@@ -953,7 +1569,41 @@ else{
                       <u key={theme_zone.id}>{theme_zone.Zone_code} - {theme_zone.Name}</u>
                     ))}
                     </h2>
-                  
+                  <h2>Events</h2>
+                    <table>
+                      <thead>
+                      <tr>
+                        <th>Event ID</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Capacity</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                      {Event4Data.map((special_events) => (
+                      <tr key={special_events.id}>
+                        <td>{special_events.Event_ID}</td>
+                        <td>{special_events.Event_name}</td>
+                        <td>{special_events.event_details}</td>
+                        <td>{special_events.event_capacity}</td>
+                        <td>{new Date(special_events.event_date).toLocaleDateString('en-US')}</td>
+                        <td>{special_events.Status}</td>
+                      </tr>
+                      ))}
+                      {InactiveEvent4Data.map((special_events) => (
+                      <tr key={special_events.id}>
+                        <td>{special_events.Event_ID}</td>
+                        <td>{special_events.Event_name}</td>
+                        <td>{special_events.event_details}</td>
+                        <td>{special_events.event_capacity}</td>
+                        <td>{new Date(special_events.event_date).toLocaleDateString('en-US')}</td>
+                        <td>{special_events.Status}</td>
+                      </tr>
+                      ))}
+                      </tbody>
+                  </table>
                     <h2>Rides</h2>
                   <table>
                       <thead>
@@ -1004,9 +1654,6 @@ else{
                         <th>Name</th>
                         <th>Type</th>
                         <th>Status</th>
-                        <th>Revenue</th>
-                        <th>Expense</th>
-                        <th>Profit</th>
                       </tr>
                       </thead>
                       <tbody>
@@ -1016,9 +1663,6 @@ else{
                         <td>{food_stalls.Name}</td>
                         <td>{food_stalls.Type}</td>
                         <td>{food_stalls.Status}</td>
-                        <td>{food_stalls.Revenue}</td>
-                        <td>{food_stalls.Expense}</td>
-                        <td>{food_stalls.Profit}</td>
                       </tr>
                       ))}
                       {InactiveStall4Data.map((food_stalls) => (
@@ -1027,9 +1671,6 @@ else{
                         <td>{food_stalls.Name}</td>
                         <td>{food_stalls.Type}</td>
                         <td>{food_stalls.Status}</td>
-                        <td>{food_stalls.Revenue}</td>
-                        <td>{food_stalls.Expense}</td>
-                        <td>{food_stalls.Profit}</td>
                       </tr>
                       ))}
                       </tbody>
@@ -1042,9 +1683,6 @@ else{
                         <th>Name</th>
                         <th>Type</th>
                         <th>Status</th>
-                        <th>Revenue</th>
-                        <th>Expense</th>
-                        <th>Profit</th>
                       </tr>
                       </thead>
                       <tbody>
@@ -1054,9 +1692,6 @@ else{
                         <td>{Merchandise.Name}</td>
                         <td>{Merchandise.ProductType}</td>
                         <td>{Merchandise.Status}</td>
-                        <td>{Merchandise.Revenue}</td>
-                        <td>{Merchandise.Expenses}</td>
-                        <td>{Merchandise.Profit}</td>
                       </tr>
                       ))}
                       {InactiveShop4Data.map((Merchandise) => (
@@ -1065,14 +1700,42 @@ else{
                         <td>{Merchandise.Name}</td>
                         <td>{Merchandise.ProductType}</td>
                         <td>{Merchandise.Status}</td>
-                        <td>{Merchandise.Revenue}</td>
-                        <td>{Merchandise.Expenses}</td>
-                        <td>{Merchandise.Profit}</td>
                       </tr>
                       ))}
                       </tbody>
                   </table>
-                 
+                  <h2>Amenities & Service</h2>
+                  <table>
+                      <thead>
+                      <tr>
+                        <th>Service ID</th>
+                        <th>Service</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Status</th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                      {Service4Data.map((amenities_and_service) => (
+                      <tr key={amenities_and_service.id}>
+                        <td>{amenities_and_service.Service_ID}</td>
+                        <td>{amenities_and_service.Service}</td>
+                        <td>{amenities_and_service.Name}</td>
+                        <td>{amenities_and_service.Description}</td>
+                        <td>{amenities_and_service.Status}</td>
+                      </tr>
+                      ))}
+                      {InactiveService4Data.map((amenities_and_service) => (
+                      <tr key={amenities_and_service.id}>
+                        <td>{amenities_and_service.Service_ID}</td>
+                        <td>{amenities_and_service.Service}</td>
+                        <td>{amenities_and_service.Name}</td>
+                        <td>{amenities_and_service.Description}</td>
+                        <td>{amenities_and_service.Status}</td>
+                      </tr>
+                      ))}
+                      </tbody>
+                  </table>
                   </div>
                 
                  </div>
@@ -1083,15 +1746,134 @@ else{
                   Add New Zone Information
                 </h2>
                 <div className="zonerideinfo">
-                  <button className="zonesectionbutton" onClick={() => showAddZoneSection('section1')}>
-                    Restaurant
+                  <button className="zonesectionbutton" onClick={() => showAddZoneSection('section0')} >
+                   Event
+                  </button>
+                  <button className="zonesectionbutton" onClick={() => showAddZoneSection('section1')} >
+                   Ride
                   </button>
                   <button className="zonesectionbutton" onClick={() => showAddZoneSection('section2')}>
+                    Restaurant
+                  </button>
+                  <button className="zonesectionbutton" onClick={() => showAddZoneSection('section3')}>
                     Merchandise shop
                   </button>
+                  <button className="zonesectionbutton" onClick={() => showAddZoneSection('section4')}>
+                    Amenity & Service
+                  </button>
             </div>
-                      <div style={{ display: addzonevisible === 'section1' ? 'block' : 'none' }}>
-                        <form onSubmit={handleaddstallinfob} method="post" action="/submit"> 
+            <div style={{ display: addzonevisible === 'section0' ? 'block' : 'none' }}>
+                <form onSubmit={handleaddeventinfo} method="post" action="/submit">
+                          
+                          <p>
+                              <label><b><u>New Event Information</u></b></label>
+                              <label for="Zone_code">Zone code:  </label>
+                              <select id = "Zone_code" name="Zone_code" required>
+                                  <option value = ""> Select theme zone </option>
+                                  {Zone1Data.map((theme_zone) => (
+                                  <option value = "ZONE0001" key={theme_zone.id}> {theme_zone.Zone_code}-{theme_zone.Name} </option>
+                                  ))}
+                                  {Zone2Data.map((theme_zone) => (
+                                  <option value = "ZONE0002" key={theme_zone.id}> {theme_zone.Zone_code}-{theme_zone.Name} </option>
+                                  ))}
+                                  {Zone3Data.map((theme_zone) => (
+                                  <option value = "ZONE0003" key={theme_zone.id}> {theme_zone.Zone_code}-{theme_zone.Name} </option>
+                                  ))}
+                                  {Zone4Data.map((theme_zone) => (
+                                  <option value = "ZONE0004"key={theme_zone.id}> {theme_zone.Zone_code}-{theme_zone.Name} </option>
+                                  ))}
+                              </select>
+
+                              <label for="Event_name">Name:  </label>
+                              <input type="text" id="Event_name" name="Event_name" min="6" max="50" required/>
+                              
+                              <label for="event_details">Description:  </label>
+                              <input type="text" id="event_details" name="event_details" min="20" max="150" required/>
+  
+                              <label for="event_capacity">Capacity:  </label>
+                              <input type="int" id="event_capacity" name="event_capacity" required/>
+
+                              <label for="event_date">Date:  </label>
+                              <input type="date" id="event_date" name="event_date" required/>
+
+                              <label for="Status">Operation Status:  </label>
+                              <select id = "Status" name="Status" required>
+                                  <option value = ""> Select status </option>
+                                  <option value = "Active"> Active </option>
+                                  <option value = "Inactive"> Inactive </option>
+                              </select>
+                          </p>
+                          <p>
+                            <br></br>
+                              <button id="UpdateAccButton" type="submit">Submit</button>
+                          </p>
+
+                      </form>
+                      </div>
+            <div style={{ display: addzonevisible === 'section1' ? 'block' : 'none' }}>
+                <form onSubmit={handleaddrideinfo} method="post" action="/submit">
+                          
+                          <p>
+                              <label><b><u>New Ride Information</u></b></label>
+                              <label for="Zone_code">Zone code:  </label>
+                              <select id = "Zone_code" name="Zone_code" required>
+                                  <option value = ""> Select theme zone </option>
+                                  {Zone1Data.map((theme_zone) => (
+                                  <option value = "ZONE0001" key={theme_zone.id}> {theme_zone.Zone_code}-{theme_zone.Name} </option>
+                                  ))}
+                                  {Zone2Data.map((theme_zone) => (
+                                  <option value = "ZONE0002" key={theme_zone.id}> {theme_zone.Zone_code}-{theme_zone.Name} </option>
+                                  ))}
+                                  {Zone3Data.map((theme_zone) => (
+                                  <option value = "ZONE0003" key={theme_zone.id}> {theme_zone.Zone_code}-{theme_zone.Name} </option>
+                                  ))}
+                                  {Zone4Data.map((theme_zone) => (
+                                  <option value = "ZONE0004"key={theme_zone.id}> {theme_zone.Zone_code}-{theme_zone.Name} </option>
+                                  ))}
+                              </select>
+
+                              <label for="RideName">Ride Name:  </label>
+                              <input type="text" id="RideName" name="RideName" min="6" max="20" required/>
+                              
+                              <label for="Description">Description:  </label>
+                              <input type="text" id="Description" name="Description" min="20" max="200" required/>
+  
+                              <label for="SafetyRules">Safety Rules:  </label>
+                              <input type="text" id="SafetyRules" name="SafetyRules" min="10" max="100" required/>
+
+                              <label for="RideType">Ride Type:  </label>
+                              <select id = "RideType" name="RideType" required>
+                                  <option value = ""> Select ride type </option>
+                                  <option value = "Casual"> Casual </option>
+                                  <option value = "Thrill"> Thrill </option>
+                                  <option value = "Water"> Water </option>
+                                  <option value = "Moderate Intensity"> Moderate Intensity </option>
+                              </select> 
+
+                              <label for="OperationStatus">Operation Status:  </label>
+                              <select id = "OperationStatus" name="OperationStatus" required>
+                                  <option value = ""> Select status </option>
+                                  <option value = "Active"> Active </option>
+                                  <option value = "Inactive"> Inactive </option>
+                              </select> 
+
+                              <label for="Accessibility">Accessibility Attraction:  </label>
+                              <select id = "Accessibility" name="Accessibility" required>
+                                  <option value = ""> Select an option </option>
+                                  <option value = "Yes"> Yes </option>
+                                  <option value = "N/A"> N/A </option>
+                              </select>
+                          </p>
+                          <p>
+                            <br></br>
+                              <button id="UpdateAccButton" type="submit">Submit</button>
+                          </p>
+
+                      </form>
+                      </div>
+                      
+                      <div style={{ display: addzonevisible === 'section2' ? 'block' : 'none' }}>
+                        <form onSubmit={handleaddstallinfo} method="post" action="/submit"> 
                           <p>
                               <label><b><u>New Restaurant Information</u></b></label>
                               <label for="Zone_code">Zone code:  </label>
@@ -1127,15 +1909,6 @@ else{
                                   <option value = "Active"> Active </option>
                                   <option value = "Inactive"> Inactive </option>
                               </select> 
-                              <label for="Revenue">Revenue:  </label>
-                              <input type="int" id="Revenue" name="Revenue" required/>
-
-                              <label for="Expenses">Expense:  </label>
-                              <input type="int" id="Expenses" name="Expenses" required/>
-
-                              <label for="Profit">Profit:  </label>
-                              <input type="int" id="Profit" name="Profit" required/>
-                          
                           </p>
                           <p>
                             <br></br>
@@ -1145,8 +1918,8 @@ else{
                       </form>
                       </div>
                       
-                      <div style={{ display: addzonevisible === 'section2' ? 'block' : 'none' }}>
-                        <form onSubmit={handleaddshopinfob} method="post" action="/submit"> 
+                      <div style={{ display: addzonevisible === 'section3' ? 'block' : 'none' }}>
+                        <form onSubmit={handleaddshopinfo} method="post" action="/submit"> 
                           <p>
                               <label><b><u>New Merchandise Shop Information</u></b></label>
                               <label for="Zone_code">Zone code:  </label>
@@ -1181,16 +1954,6 @@ else{
                                   <option value = "Active"> Active </option>
                                   <option value = "Inactive"> Inactive </option>
                               </select> 
-
-                              <label for="Revenue">Revenue:  </label>
-                              <input type="int" id="Revenue" name="Revenue" required/>
-
-                              <label for="Expenses">Expense:  </label>
-                              <input type="int" id="Expenses" name="Expenses" required/>
-
-                              <label for="Profit">Profit:  </label>
-                              <input type="int" id="Profit" name="Profit" required/>
-                          
                           </p>
                           <p>
                             <br></br>
@@ -1199,7 +1962,56 @@ else{
 
                       </form>
                       </div>
-                      
+                      <div style={{ display: addzonevisible === 'section4' ? 'block' : 'none' }}>
+                        <form onSubmit={handleaddserviceinfo} method="post" action="/submit"> 
+                          <p>
+                              <label><b><u>New Amenity & Service Information</u></b></label>
+                              <label for="Zone_code">Zone code:  </label>
+                              <select id = "Zone_code" name="Zone_code" required>
+                                  <option value = ""> Select theme zone </option>
+                                  {Zone1Data.map((theme_zone) => (
+                                  <option value = "ZONE0001" key={theme_zone.id}> {theme_zone.Zone_code}-{theme_zone.Name} </option>
+                                  ))}
+                                  {Zone2Data.map((theme_zone) => (
+                                  <option value = "ZONE0002" key={theme_zone.id}> {theme_zone.Zone_code}-{theme_zone.Name} </option>
+                                  ))}
+                                  {Zone3Data.map((theme_zone) => (
+                                  <option value = "ZONE0003" key={theme_zone.id}> {theme_zone.Zone_code}-{theme_zone.Name} </option>
+                                  ))}
+                                  {Zone4Data.map((theme_zone) => (
+                                  <option value = "ZONE0004"key={theme_zone.id}> {theme_zone.Zone_code}-{theme_zone.Name} </option>
+                                  ))}
+                              </select>
+
+                              <label for="Service">Service:  </label>
+                              <select id = "Service" name="Service" required>
+                                  <option value = ""> Select service </option>
+                                  <option value = "Lounge"> Lounge </option>
+                                  <option value = "Restroom"> Restroom </option>
+                                  <option value = "Lockers"> Lockers </option>
+                                
+                              </select>
+
+                              <label for="Name">Name:  </label>
+                              <input type="text" id="Name" name="Name" min="6" max="30" required/>
+                              
+                              <label for="Description">Description:  </label>
+                              <input type="text" id="Description" name="Description" min="6" max="35" required/>
+                              
+                              <label for="Status">Operation Status:  </label>
+                              <select id = "Status" name="Status" required>
+                                  <option value = ""> Select status </option>
+                                  <option value = "Active"> Active </option>
+                                  <option value = "Inactive"> Inactive </option>
+                              </select> 
+                          </p>
+                          <p>
+                            <br></br>
+                              <button id="UpdateAccButton" type="submit">Submit</button>
+                          </p>
+
+                      </form>
+                      </div>
                  </div>
               </div>
               <div style={{ display: visible === 'section5' ? 'block' : 'none' }}>
@@ -1208,18 +2020,138 @@ else{
                   Update Zone Information
                 </h2>
                 <div className="zonerideinfo">
-                  
-                  <button className="zonesectionbutton" onClick={() => showUpdateZoneSection('section0')}>
+                  <button className="zonesectionbutton" onClick={() => showUpdateZoneSection('section0')} >
+                   Event
+                  </button>
+                  <button className="zonesectionbutton" onClick={() => showUpdateZoneSection('section1')} >
+                   Ride
+                  </button>
+                  <button className="zonesectionbutton" onClick={() => showUpdateZoneSection('section2')}>
                     Restaurant
                   </button>
-                  <button className="zonesectionbutton" onClick={() => showUpdateZoneSection('section1')}>
+                  <button className="zonesectionbutton" onClick={() => showUpdateZoneSection('section3')}>
                     Merchandise shop
                   </button>
-                  
+                  <button className="zonesectionbutton" onClick={() => showUpdateZoneSection('section4')}>
+                    Amenity & Service
+                  </button>
             </div>
-            
-                      <div style={{ display: updatezonevisible === 'section0' ? 'block' : 'none' }}>
-                        <form onSubmit={handleupdatestallinfob} method="post" action="/submit"> 
+            <div style={{ display: updatezonevisible === 'section0' ? 'block' : 'none' }}>
+                <form onSubmit={handleupdateeventinfo} method="post" action="/submit">
+                          
+                          <p>
+                              <label><b><u>Update Event Information</u></b></label>
+                              <label for="Zone_code">Zone code:  </label>
+                              <select id = "Zone_code" name="Zone_code" required>
+                                  <option value = ""> Select theme zone </option>
+                                  {Zone1Data.map((theme_zone) => (
+                                  <option value = "ZONE0001" key={theme_zone.id}> {theme_zone.Zone_code}-{theme_zone.Name} </option>
+                                  ))}
+                                  {Zone2Data.map((theme_zone) => (
+                                  <option value = "ZONE0002" key={theme_zone.id}> {theme_zone.Zone_code}-{theme_zone.Name} </option>
+                                  ))}
+                                  {Zone3Data.map((theme_zone) => (
+                                  <option value = "ZONE0003" key={theme_zone.id}> {theme_zone.Zone_code}-{theme_zone.Name} </option>
+                                  ))}
+                                  {Zone4Data.map((theme_zone) => (
+                                  <option value = "ZONE0004"key={theme_zone.id}> {theme_zone.Zone_code}-{theme_zone.Name} </option>
+                                  ))}
+                              </select>
+                              
+                              <label for="Event_ID">Event ID:  </label>
+                              <input type="text" id="Event_ID" name="Event_ID" min="8" max="8" required/>
+
+                              <label for="Event_name">Name:  </label>
+                              <input type="text" id="Event_name" name="Event_name" min="6" max="50" required/>
+                              
+                              <label for="event_details">Description:  </label>
+                              <input type="text" id="event_details" name="event_details" min="20" max="150" required/>
+  
+                              <label for="event_capacity">Capacity:  </label>
+                              <input type="int" id="event_capacity" name="event_capacity" required/>
+
+                              <label for="event_date">Date:  </label>
+                              <input type="date" id="event_date" name="event_date" required/>
+
+                              <label for="Status">Operation Status:  </label>
+                              <select id = "Status" name="Status" required>
+                                  <option value = ""> Select status </option>
+                                  <option value = "Active"> Active </option>
+                                  <option value = "Inactive"> Inactive </option>
+                              </select>
+                          </p>
+                          <p>
+                            <br></br>
+                              <button id="UpdateAccButton" type="submit">Submit</button>
+                          </p>
+
+                      </form>
+                      </div>
+                <div style={{ display: updatezonevisible === 'section1' ? 'block' : 'none' }}>
+                <form onSubmit={handleupdaterideinfo} method="post" action="/submit">
+                          <label><b><u>Update Ride Information</u></b></label>
+                          <p>
+                          <label for="Zone_code">Zone code:  </label>
+                              <select id = "Zone_code" name="Zone_code" required>
+                                  <option value = ""> Select theme zone </option>
+                                  {Zone1Data.map((theme_zone) => (
+                                  <option value = "ZONE0001" key={theme_zone.id}> {theme_zone.Zone_code}-{theme_zone.Name} </option>
+                                  ))}
+                                  {Zone2Data.map((theme_zone) => (
+                                  <option value = "ZONE0002" key={theme_zone.id}> {theme_zone.Zone_code}-{theme_zone.Name} </option>
+                                  ))}
+                                  {Zone3Data.map((theme_zone) => (
+                                  <option value = "ZONE0003" key={theme_zone.id}> {theme_zone.Zone_code}-{theme_zone.Name} </option>
+                                  ))}
+                                  {Zone4Data.map((theme_zone) => (
+                                  <option value = "ZONE0004"key={theme_zone.id}> {theme_zone.Zone_code}-{theme_zone.Name} </option>
+                                  ))}
+                              </select>
+
+                              <label for="RideID">Ride ID:  </label>
+                              <input type="text" id="RideID" name="RideID" min="8" max="8" required/>
+
+                              <label for="RideName">Ride Name:  </label>
+                              <input type="text" id="RideName" name="RideName" min="6" max="50" required/>
+                              
+                              <label for="Description">Description:  </label>
+                              <input type="text" id="Description" name="Description" min="20" max="500" required/>
+  
+                              <label for="SafetyRules">Safety Rules:  </label>
+                              <input type="text" id="SafetyRules" name="SafetyRules" min="10" max="500" required/>
+
+                              <label for="RideType">Ride Type:  </label>
+                              <select id = "RideType" name="RideType" required>
+                                  <option value = ""> Select ride type </option>
+                                  <option value = "Casual"> Casual </option>
+                                  <option value = "Thrill"> Thrill </option>
+                                  <option value = "Water"> Water </option>
+                                  <option value = "Moderate Intensity"> Moderate Intensity </option>
+                              </select> 
+
+                              <label for="OperationStatus">Operation Status:  </label>
+                              <select id = "OperationStatus" name="OperationStatus" required>
+                                  <option value = ""> Select status </option>
+                                  <option value = "Active"> Active </option>
+                                  <option value = "Inactive"> Inactive </option>
+                              </select> 
+
+                              <label for="Accessibility">Accessibility Attraction:  </label>
+                              <select id = "Accessibility" name="Accessibility" required>
+                                  <option value = ""> Select an option </option>
+                                  <option value = "Yes"> Yes </option>
+                                  <option value = "N/A"> N/A </option>
+                              </select>
+                          </p>
+                          <p>
+                            <br></br>
+                              <button id="UpdateAccButton" type="submit">Submit</button>
+                          </p>
+
+                      </form>
+                      </div>
+                      <div style={{ display: updatezonevisible === 'section2' ? 'block' : 'none' }}>
+                        <form onSubmit={handleupdatestallinfo} method="post" action="/submit"> 
                           <p>
                               <label><b><u>Update Restaurant Information</u></b></label>
                               <label for="Zone_code">Zone code:  </label>
@@ -1258,16 +2190,6 @@ else{
                                   <option value = "Active"> Active </option>
                                   <option value = "Inactive"> Inactive </option>
                               </select> 
-
-                              <label for="Revenue">Revenue:  </label>
-                              <input type="int" id="Revenue" name="Revenue" required/>
-
-                              <label for="Expense">Expense:  </label>
-                              <input type="int" id="Expense" name="Expenses" required/>
-
-                              <label for="Profit">Profit:  </label>
-                              <input type="int" id="Profit" name="Profit" required/>
-                          
                           </p>
                           <p>
                             <br></br>
@@ -1277,8 +2199,8 @@ else{
                       </form>
                       </div>
                       
-                      <div style={{ display: updatezonevisible === 'section1' ? 'block' : 'none' }}>
-                        <form onSubmit={handleupdateshopinfob} method="post" action="/submit"> 
+                      <div style={{ display: updatezonevisible === 'section3' ? 'block' : 'none' }}>
+                        <form onSubmit={handleupdateshopinfo} method="post" action="/submit"> 
                           <p>
                               <label><b><u>Update Merchandise Shop Information</u></b></label>
                               <label for="Zone_code">Zone code:  </label>
@@ -1316,15 +2238,6 @@ else{
                                   <option value = "Active"> Active </option>
                                   <option value = "Inactive"> Inactive </option>
                               </select> 
-
-                              <label for="Revenue">Revenue:  </label>
-                              <input type="int" id="Revenue" name="Revenue" required/>
-
-                              <label for="Expenses">Expense:  </label>
-                              <input type="int" id="Expenses" name="Expenses" required/>
-
-                              <label for="Profit">Profit:  </label>
-                              <input type="int" id="Profit" name="Profit" required/>
                           </p>
                           <p>
                             <br></br>
@@ -1333,10 +2246,219 @@ else{
 
                       </form>
                       </div>
-                      
+                      <div style={{ display: updatezonevisible === 'section4' ? 'block' : 'none' }}>
+                        <form onSubmit={handleupdateserviceinfo} method="post" action="/submit"> 
+                          <p>
+                              <label><b><u>Update Amenity & Service Information</u></b></label>
+                              <label for="Zone_code">Zone code:  </label>
+                              <select id = "Zone_code" name="Zone_code" required>
+                                  <option value = ""> Select theme zone </option>
+                                  {Zone1Data.map((theme_zone) => (
+                                  <option value = "ZONE0001" key={theme_zone.id}> {theme_zone.Zone_code}-{theme_zone.Name} </option>
+                                  ))}
+                                  {Zone2Data.map((theme_zone) => (
+                                  <option value = "ZONE0002" key={theme_zone.id}> {theme_zone.Zone_code}-{theme_zone.Name} </option>
+                                  ))}
+                                  {Zone3Data.map((theme_zone) => (
+                                  <option value = "ZONE0003" key={theme_zone.id}> {theme_zone.Zone_code}-{theme_zone.Name} </option>
+                                  ))}
+                                  {Zone4Data.map((theme_zone) => (
+                                  <option value = "ZONE0004"key={theme_zone.id}> {theme_zone.Zone_code}-{theme_zone.Name} </option>
+                                  ))}
+                              </select>
+
+                              <label for="Service_ID">Service ID:  </label>
+                              <input type="text" id="Service_ID" name="Service_ID" min="8" max="8" required/>
+
+                              <label for="Service">Service:  </label>
+                              <select id = "Service" name="Service" required>
+                                  <option value = ""> Select service </option>
+                                  <option value = "Lounge"> Lounge </option>
+                                  <option value = "Restroom"> Restroom </option>
+                                  <option value = "Lockers"> Lockers </option>
+                                
+                              </select>
+
+                              <label for="Name">Name:  </label>
+                              <input type="text" id="Name" name="Name" min="6" max="30" required/>
+                              
+                              <label for="Description">Description:  </label>
+                              <input type="text" id="Description" name="Description" min="6" max="35" required/>
+                              
+                              <label for="Status">Operation Status:  </label>
+                              <select id = "Status" name="Status" required>
+                                  <option value = ""> Select status </option>
+                                  <option value = "Active"> Active </option>
+                                  <option value = "Inactive"> Inactive </option>
+                              </select> 
+                          </p>
+                          <p>
+                            <br></br>
+                              <button id="UpdateAccButton" type="submit">Submit</button>
+                          </p>
+
+                      </form>
+                      </div>
                  </div>
               </div>
-              
+              <div style={{ display: visible === 'section6' ? 'block' : 'none' }}>
+              <div className="optiontextbox">
+                <h2>Injury Cases</h2>
+                <p>Please choose a day range for injury case.</p>
+                <form id="UpdateAccPas" onSubmit={handledateinjurycase} method="post" action="/submit">
+                  <p>
+                    <label for="FromDate">From: </label>
+                    <input
+                      type="date"
+                      id="FromDate"
+                      name="FromDate"
+                      required
+                    />
+
+                    <label for="ToDate">To: </label>
+                    <input
+                      type="date"
+                      id="ToDate"
+                      name="ToDate"
+                      required
+                    />
+                  </p>
+                  <p>
+                    <button id="UpdateAccButton" type="submit">Submit</button>
+                  </p>
+                </form>
+                <table>
+                      <thead>
+                      <tr>
+                        <th>Injury Case ID</th>
+                        <th>Ride ID</th>
+                        <th>Date</th>
+                        <th>Severity Scale</th>
+                        <th>Amount of Injured cases</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                      {InjuryCaseData.map((injury_case) => (
+                        <tr key={injury_case.id}>
+                        <td>{injury_case.InjuryCaseID}</td>
+                        <td>{injury_case.RideID}</td>
+                        <td>{new Date(injury_case.Date).toLocaleDateString('en-US')}</td>
+                        <td>{injury_case.SeverityScale}</td>
+                        <td>{injury_case.AmountInjured}</td>
+                        </tr>
+                      ))}
+                      </tbody>
+                </table>
+                <h2>Injury Cases Report</h2>
+                <p>This report shows records of how many injury cases does a ride have weekly.
+                  <br></br>
+                  And
+                  <br></br> How many times does a ride do breakdown weekly.
+                  <br></br>Please choose a day range for injury case report.
+                </p>
+                <form id="UpdateAccPas" onSubmit={handledateinjuryreport} method="post" action="/submit">
+                  <p>
+                    <label for="FromDate">From: </label>
+                    <input
+                      type="date"
+                      id="FromDate"
+                      name="FromDate"
+                      required
+                    />
+
+                    <label for="ToDate">To: </label>
+                    <input
+                      type="date"
+                      id="ToDate"
+                      name="ToDate"
+                      required
+                    />
+                  </p>
+                  <p>
+                    <button id="UpdateAccButton" type="submit">Submit</button>
+                  </p>
+                </form>
+                <table>
+                      <thead>
+                      <tr>
+                        <th>Ride</th>
+                        <th>Year</th>
+                        <th>Month</th>
+                        <th>Week</th>
+                        <th>Average Injured cases</th>
+                        <th>Total Breakdown Rides</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                      {InjuryReportData.map((injury) => (
+                        <tr key={injury.id}>
+                        <td>{injury.RideName}</td>
+                        <td>{injury.Year}</td>
+                        <td>{injury.Month}</td>
+                        <td>{injury.Week}</td>
+                        <td>{injury.AvgInjured}</td>
+                        <td>{injury.Breakdowns}</td>
+                        </tr>
+                      ))}
+                      </tbody>
+                </table>
+
+                <h2>Add New or Update Injury Case</h2>
+                <div className="injurycaseinfo">
+                  <button className="injurycasebutton" onClick={() => showInjuryCaseSection('section1')} >
+                   Add new issue log
+                  </button>
+                  <button className="injurycasebutton" onClick={() => showInjuryCaseSection('section2')} >
+                   Update issue log
+                  </button>
+            </div>
+                <div style={{ display: injurycasevisible === 'section1' ? 'block' : 'none' }}>
+                <h3><u>New Injury Case</u></h3>
+                <form id="UpdateAccPas" onSubmit={handlenewinjury}  method="post" action="/submit">
+                  <p>
+                    <label for="RideID">Ride ID: </label>
+                    <input type="text" id="RideID" name="RideID" min="8" max="8" required />
+
+                    <label for="Date">Date: </label>
+                    <input type="date" id="Date" name="Date" required />
+
+                    <label for="SeverityScale">Severity Scale: </label>
+                    <input type="text" id="SeverityScale" name="SeverityScale" min="1" max="1" required />
+
+                    <label for="AmountInjured">From: </label>
+                    <input type="int" id="AmountInjured" name="AmountInjured" required />
+                  </p>
+                  <p>
+                    <button id="UpdateAccButton" type="submit">Submit</button>
+                  </p>
+                </form>
+                 </div>
+                 <div style={{ display: injurycasevisible === 'section2' ? 'block' : 'none' }}>
+                <h3><u>Update Injury Case</u></h3>
+                <form id="UpdateAccPas" onSubmit={handleupdateinjury}  method="post" action="/submit">
+                  <p>
+                    <label for="InjuryCaseID">Injury Case ID: </label>
+                    <input type="text" id="InjuryCaseID" name="InjuryCaseID" min="8" max="8" required />
+
+                    <label for="RideID">Ride ID: </label>
+                    <input type="text" id="RideID" name="RideID" min="8" max="8" required />
+
+                    <label for="Date">Date: </label>
+                    <input type="date" id="Date" name="Date" required />
+
+                    <label for="SeverityScale">Severity Scale: </label>
+                    <input type="text" id="SeverityScale" name="SeverityScale" min="1" max="1" required />
+
+                    <label for="AmountInjured">From: </label>
+                    <input type="int" id="AmountInjured" name="AmountInjured" required />
+                  </p>
+                  <p>
+                    <button id="UpdateAccButton" type="submit">Submit</button>
+                  </p>
+                </form>
+                 </div>
+                 </div>
+              </div>
             </div>
                   
                 <br></br>
