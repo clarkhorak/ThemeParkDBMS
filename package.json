@@ -26,7 +26,7 @@
     "start:react": "react-scripts start",
     "build:react": "react-scripts build",
     "start:server": "node Server.js",
-    "start": "concurrently \"npm run start:react\" \"npm run start:server\""
+    "start": "concurrently \"npm run build:react\" \"npm run start:server\""
   },
   "eslintConfig": {
     "extends": [
@@ -57,5 +57,16 @@
 
   "browser": {
     "path": false
-    }
+    },
+
+  "browser": {
+    "path": false
+  },
+  "navigationFallback": {
+    "rewrite": "index.html",
+    "exclude": ["/static/images/*.{png,jpg,gif}", "/static/css/*"]
+  },
+  "mimeTypes": {
+    ".json": "text/json"
+  }
 }
