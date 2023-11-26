@@ -178,6 +178,28 @@
   width: 90vw;
 }
 
+.AddZoneInfo{
+  color: #000000;
+  font-size: 20px;
+  left: 15px;
+  letter-spacing: 0;
+  line-height: normal;
+  position: absolute;
+  top: 220px;
+  width: 168px;
+}
+
+.UpdateZoneInfo{
+  color: #000000;
+  font-size: 20px;
+  left: 15px;
+  letter-spacing: 0;
+  line-height: normal;
+  position: absolute;
+  top: 310px;
+  width: 168px;
+}
+
 button {
   background-color: rgba(255, 255, 255, 0);
   color: rgb(0, 0, 0);
